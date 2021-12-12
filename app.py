@@ -475,4 +475,4 @@ api.add_resource(Patients, '/patients')
 
 if __name__ == '__main__':
     load_dotenv()
-    app.run(port=5000)
+    app.run()
