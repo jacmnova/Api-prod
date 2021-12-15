@@ -551,9 +551,32 @@ def appointments_update_v2(info):
     attention_number = info['attentionNumber']
     covenant = info['covenant']
     patient_covenat = covenant
-    info_cid = cid.get_cid_by_id(info['cid']['id'])
-    cid_id = info_cid['id'],
-    cid_name = info_cid['name']
+    cid_id = ''
+    cid_name = ''
+
+    vazio = False
+    try:
+        if len(info['cid']['id']) > 0:
+            print("Soy vacio")
+            print(info['cid']['id'])
+        vazio = True
+    except:
+        print("no soy vacio")
+        print(info['cid']['id'])
+        vazio = False
+
+    if vazio == False:
+        info_cid = cid.get_cid_by_id(info['cid']['id'])
+        cid_id = info_cid['id']
+        cid_name = info_cid['name']
+    else:
+        cid_id = ''
+        cid_name = ''
+
+
+    # info_cid = cid.get_cid_by_id(info['cid']['id'])
+    # cid_id = info_cid['id'],
+    # cid_name = info_cid['name']
     dose = info['dose']
     medicine_item_name = ''
     medicine_item_id = 0
@@ -596,7 +619,7 @@ def appointments_update_v2(info):
                             hospital_id = %s,
                             hospital_name = %s,
                             data_last_atendimineto = %s,
-                          
+
                             patient_covenat = %s,
                             cid_id = %s,
                             cid_name = %s,
@@ -617,60 +640,115 @@ def appointments_update_v2(info):
         cur.close()
 
     else:
+        try:
+            medicine_item_name = medicine_info['name']
+            medicine_item_id = medicine_info['id']
+            cur = conection.conn.cursor()
+            if cid_id == '':
+                cur.execute("""UPDATE public.appointment_complete SET
+                                                hospital_id = %s,
+                                                hospital_name = %s,
+                                                created_on = %s,
+                                                attention_number = %s,
+                                                covenant = %s,
+                                                patient_covenat = %s,
+                                                cid_id = NULL,
+                                                cid_name = %s,
+                                                medicine_item_name = %s,
+                                                dose = %s
+                                                WHERE id = %s""", (hospital_id,
+                                                                   hospital_name,
+                                                                   created_on,
+                                                                   attention_number,
+                                                                   covenant,
+                                                                   patient_covenat,
+                                                                   cid_name,
+                                                                   medicine_item_name,
+                                                                   dose, id_))
+                conection.conn.commit()
 
-        medicine_item_name = medicine_info['name']
-        medicine_item_id = medicine_info['id']
+                cur.execute("""SELECT patient_id FROM appointment_complete WHERE id = """ + id_)
+                patient_id = cur.fetchone()[0]
 
-        cur = conection.conn.cursor()
-        cur.execute("""UPDATE public.appointment_complete SET
-                        hospital_id = %s,
-                        hospital_name = %s,
-                        created_on = %s,
-                        attention_number = %s,
-                        covenant = %s,
-                        patient_covenat = %s,
-                        cid_id = %s,
-                        cid_name = %s,
-                        medicine_item_name = %s,
-                        dose = %s
-                        WHERE id = %s""", (hospital_id,
-                                           hospital_name,
-                                           created_on,
-                                           attention_number,
-                                           covenant,
-                                           patient_covenat,
-                                           cid_id,
-                                           cid_name,
-                                           medicine_item_name,
-                                           dose, id_))
-        conection.conn.commit()
+                cur.execute("""UPDATE public.appointment_history SET
+                                                        hospital_id = %s,
+                                                        hospital_name = %s,
+                                                        data_last_atendimineto = %s,
 
-        cur.execute("""SELECT patient_id FROM appointment_complete WHERE id = """ + id_)
-        patient_id = cur.fetchone()[0]
+                                                        patient_covenat = %s,
+                                                        cid_id = NULL,
+                                                        cid_name = %s,
+                                                        medicine_item_id = %s,
+                                                        medicine_item_name = %s,
+                                                        dose = %s
+                                                        WHERE patient_id = %s""", (hospital_id,
+                                                                                   hospital_name,
+                                                                                   created_on,
 
-        cur.execute("""UPDATE public.appointment_history SET
-                            hospital_id = %s,
-                            hospital_name = %s,
-                            data_last_atendimineto = %s,
-                         
-                            patient_covenat = %s,
-                            cid_id = %s,
-                            cid_name = %s,
-                            medicine_item_id = %s,
-                            medicine_item_name = %s,
-                            dose = %s
-                            WHERE patient_id = %s""", (hospital_id,
-                                                       hospital_name,
-                                                       created_on,
+                                                                                   patient_covenat,
 
-                                                       patient_covenat,
-                                                       cid_id,
-                                                       cid_name,
-                                                       medicine_item_id,
-                                                       medicine_item_name,
-                                                       dose, patient_id))
-        conection.conn.commit()
-        cur.close()
+                                                                                   cid_name,
+                                                                                   medicine_item_id,
+                                                                                   medicine_item_name,
+                                                                                   dose, patient_id))
+                conection.conn.commit()
+                cur.close()
+            else:
+                cur.execute("""UPDATE public.appointment_complete SET
+                                                           hospital_id = %s,
+                                                           hospital_name = %s,
+                                                           created_on = %s,
+                                                           attention_number = %s,
+                                                           covenant = %s,
+                                                           patient_covenat = %s,
+                                                           cid_id = %s,
+                                                           cid_name = %s,
+                                                           medicine_item_name = %s,
+                                                           dose = %s
+                                                           WHERE id = %s""", (hospital_id,
+                                                                              hospital_name,
+                                                                              created_on,
+                                                                              attention_number,
+                                                                              covenant,
+                                                                              patient_covenat,
+                                                                              cid_id,
+                                                                              cid_name,
+                                                                              medicine_item_name,
+                                                                              dose, id_))
+                conection.conn.commit()
+
+                cur.execute("""SELECT patient_id FROM appointment_complete WHERE id = """ + id_)
+                patient_id = cur.fetchone()[0]
+
+                cur.execute("""UPDATE public.appointment_history SET
+                                                                   hospital_id = %s,
+                                                                   hospital_name = %s,
+                                                                   data_last_atendimineto = %s,
+
+                                                                   patient_covenat = %s,
+                                                                   cid_id = %s,
+                                                                   cid_name = %s,
+                                                                   medicine_item_id = %s,
+                                                                   medicine_item_name = %s,
+                                                                   dose = %s
+                                                                   WHERE patient_id = %s""", (hospital_id,
+                                                                                              hospital_name,
+                                                                                              created_on,
+
+                                                                                              patient_covenat,
+                                                                                              cid_id,
+                                                                                              cid_name,
+                                                                                              medicine_item_id,
+                                                                                              medicine_item_name,
+                                                                                              dose, patient_id))
+                conection.conn.commit()
+                cur.close()
+        except:
+            curs = conection.conn.cursor()
+            curs.execute("ROLLBACK")
+            conection.conn.commit()
+            curs.close()
+            return
 
 
 

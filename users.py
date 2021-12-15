@@ -6,6 +6,7 @@ from datetime import datetime
 import doctors
 import emails
 from function_jwt import write_token, validate_token
+import psycopg2
 
 ## characters to generate password from
 characters = list(string.ascii_letters + string.digits + "!@#$%^&*()")
@@ -233,10 +234,14 @@ def verify_user(username, password):
         login = check(password, encrypt)
         return login
     except:
-        curs = conection.conn.cursor()
-        curs.execute("ROLLBACK")
+        conn = psycopg2.connect(host="cobra.cvc6fic9cofz.us-east-1.rds.amazonaws.com",
+                                database="cobra",
+                                user="postgres",
+                                password="cobra2021*")
+        cur = conection.conn.cursor()
+        cur.execute("ROLLBACK")
         conection.conn.commit()
-        curs.close()
+        cur.close()
         return False
 
 
@@ -372,7 +377,7 @@ def update_password_temp(info, token):
 def terms(info, token):
     info_user = validate_token(token, True)
     cur = conection.conn.cursor()
-    cur.execute("""UPDATE public.login_user SET  terms_condition=true WHERE username= '"""+ str(info_user['username']) + """'""")
+    cur.execute("""UPDATE public.login_user SET  terms_condition=true WHERE username= '""" + str(info_user['username']) + """'""")
     conection.conn.commit()
     cur.close()
     return
@@ -382,64 +387,16 @@ def get_user_info(info):
     return
 
 def resend_pass(user):
-    temporal_password = generate_random_password()
-    pass_temp = temporal_password
-    temporal_password = encrypt_pass(temporal_password)
-    password = temporal_password
-    password = '{bcrypt}' + str(password).split("'")[1]
-    cur = conection.conn.cursor()
-    cur.execute("""SELECT username, "name", app_type FROM public.login_user WHERE username = '""" + user + """'""")
-    records = cur.fetchall()
-    cur.close()
-    content = {}
-    for i in records:
-        content = {
-            'username': i[0],
-            'name': i[1],
-            'pass_temp': pass_temp,
-            'password': password,
-            'app_type': i[2],
-        }
-
-    # ios_code = {}
-    # if content['app_type'] == 'IOS':
-    #     cur = conection.conn.cursor()
-    #     cur.execute("""SELECT id, link FROM public.ios_codes WHERE email is null   limit 1;""")
-    #     values = cur.fetchall()
-    #     cur.close()
-    #     ios_code = {
-    #         'id': values[0][0],
-    #         'code': values[0][1]
-    #     }
-
-    # print(content)
-    # print(ios_code)
-    print(content)
-    cur = conection.conn.cursor()
-    cur.execute("""UPDATE public.login_user SET "password"=%s, temp_password=true WHERE username=%s;""", (content['password'], content['username']))
-    conection.conn.commit()
-    # cur.execute("""UPDATE public.ios_codes SET email = %s WHERE id = %s;""", (content['username'], ios_code['id']))
-    # conection.conn.commit()
-    cur.close()
-
-    emails.send_mail_recovery(content['pass_temp'], content['username'], content['name'])
-
-    return
-
-def forgot(user):
-    temporal_password = generate_random_password()
-    pass_temp = temporal_password
-    temporal_password = encrypt_pass(temporal_password)
-    password = temporal_password
-    password = '{bcrypt}' + str(password).split("'")[1]
-    cur = conection.conn.cursor()
-    cur.execute("""SELECT username, "name", app_type FROM public.login_user WHERE username = '""" + user + """'""")
-    records = cur.fetchall()
-    cur.close()
-    print(records)
-    if len(records) == 0:
-        return False
-    else:
+    try:
+        temporal_password = generate_random_password()
+        pass_temp = temporal_password
+        temporal_password = encrypt_pass(temporal_password)
+        password = temporal_password
+        password = '{bcrypt}' + str(password).split("'")[1]
+        cur = conection.conn.cursor()
+        cur.execute("""SELECT username, "name", app_type FROM public.login_user WHERE username = '""" + user + """'""")
+        records = cur.fetchall()
+        cur.close()
         content = {}
         for i in records:
             content = {
@@ -450,6 +407,19 @@ def forgot(user):
                 'app_type': i[2],
             }
 
+        # ios_code = {}
+        # if content['app_type'] == 'IOS':
+        #     cur = conection.conn.cursor()
+        #     cur.execute("""SELECT id, link FROM public.ios_codes WHERE email is null   limit 1;""")
+        #     values = cur.fetchall()
+        #     cur.close()
+        #     ios_code = {
+        #         'id': values[0][0],
+        #         'code': values[0][1]
+        #     }
+
+        # print(content)
+        # print(ios_code)
         print(content)
         cur = conection.conn.cursor()
         cur.execute("""UPDATE public.login_user SET "password"=%s, temp_password=true WHERE username=%s;""", (content['password'], content['username']))
@@ -460,43 +430,106 @@ def forgot(user):
 
         emails.send_mail_recovery(content['pass_temp'], content['username'], content['name'])
 
-        return True
+        return
+    except:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        return False
+
+def forgot(user):
+    try:
+        temporal_password = generate_random_password()
+        pass_temp = temporal_password
+        temporal_password = encrypt_pass(temporal_password)
+        password = temporal_password
+        password = '{bcrypt}' + str(password).split("'")[1]
+        cur = conection.conn.cursor()
+        cur.execute("""SELECT username, "name", app_type FROM public.login_user WHERE username = '""" + user + """'""")
+        records = cur.fetchall()
+        cur.close()
+        print(records)
+        if len(records) == 0:
+            return False
+        else:
+            content = {}
+            for i in records:
+                content = {
+                    'username': i[0],
+                    'name': i[1],
+                    'pass_temp': pass_temp,
+                    'password': password,
+                    'app_type': i[2],
+                }
+
+            print(content)
+            cur = conection.conn.cursor()
+            cur.execute("""UPDATE public.login_user SET "password"=%s, temp_password=true WHERE username=%s;""", (content['password'], content['username']))
+            conection.conn.commit()
+            # cur.execute("""UPDATE public.ios_codes SET email = %s WHERE id = %s;""", (content['username'], ios_code['id']))
+            # conection.conn.commit()
+            cur.close()
+
+            emails.send_mail_recovery(content['pass_temp'], content['username'], content['name'])
+
+            return True
+    except:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        return False
 
 def sendIos_code(user):
-    cur = conection.conn.cursor()
-    cur.execute("""SELECT username, "name", app_type FROM public.login_user WHERE username = '""" + user + """'""")
-    records = cur.fetchall()
-    cur.close()
-    content = {}
-    for i in records:
-        content = {
-            'username': i[0],
-            'name': i[1],
-            'app_type': i[2],
+    try:
+        cur = conection.conn.cursor()
+        cur.execute("""SELECT username, "name", app_type FROM public.login_user WHERE username = '""" + user + """'""")
+        records = cur.fetchall()
+        cur.close()
+        content = {}
+        for i in records:
+            content = {
+                'username': i[0],
+                'name': i[1],
+                'app_type': i[2],
+            }
+
+        cur = conection.conn.cursor()
+        cur.execute("""SELECT id, link FROM public.ios_codes WHERE email is null   limit 1;""")
+        values = cur.fetchall()
+        cur.close()
+        ios_code = {
+            'id': values[0][0],
+            'code': values[0][1]
         }
 
-    cur = conection.conn.cursor()
-    cur.execute("""SELECT id, link FROM public.ios_codes WHERE email is null   limit 1;""")
-    values = cur.fetchall()
-    cur.close()
-    ios_code = {
-        'id': values[0][0],
-        'code': values[0][1]
-    }
-
-    emails.send_mail_ios(content['username'], content['name'], ios_code['code'])
-    cur = conection.conn.cursor()
-    cur.execute("""UPDATE public.ios_codes SET email = %s WHERE id = %s;""", (content['username'], ios_code['id']))
-    conection.conn.commit()
-    cur.close()
-    return
+        emails.send_mail_ios(content['username'], content['name'], ios_code['code'])
+        cur = conection.conn.cursor()
+        cur.execute("""UPDATE public.ios_codes SET email = %s WHERE id = %s;""", (content['username'], ios_code['id']))
+        conection.conn.commit()
+        cur.close()
+        return
+    except:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        return
 
 def delete_user(id):
-    cur = conection.conn.cursor()
-    cur.execute("UPDATE public.login_user SET enabled = false, status = 'DEACTIVATED' WHERE id =" + str(id))
-    conection.conn.cursor()
-    cur.close()
-    return
+    try:
+        cur = conection.conn.cursor()
+        cur.execute("UPDATE public.login_user SET enabled = false, status = 'DEACTIVATED' WHERE id =" + str(id))
+        conection.conn.cursor()
+        cur.close()
+        return
+    except:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        return
 
 
 def user_download():

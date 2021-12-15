@@ -47,6 +47,7 @@ def loginMobile():
 def login():
     data = request.get_json()
     login = users.verify_user(data['username'], data['password'])
+    print(login)
     if login:
         minutes = 10
         data = users.get_data_user(data['username'])
@@ -83,7 +84,6 @@ def updatePassword():
 @routes_auth.route("/api/login/terms", methods=['post'])
 def terms():
     token = request.headers
-    print(token)
     token = request.headers["Authorization"].split(" ")[1]
     users.terms(request.json, token)
     return jsonify({'update': True})
