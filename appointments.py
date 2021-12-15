@@ -454,9 +454,28 @@ def appointments_update(info):
     hospital_info = hospitals.get_hospital_by_id(info['hospital']['id'])
     hospital_id = hospital_info['id']
     hospital_name = hospital_info['name']
-    info_cid = cid.get_cid_by_id(info['cid']['id'])
-    cid_id = info_cid['id']
-    cid_name = info_cid['name']
+    vazio = False
+    try:
+        if len(info['cid']['id']) > 0:
+            print("Soy vacio")
+            print(info['cid']['id'])
+        vazio = True
+    except:
+        print("no soy vacio")
+        print(info['cid']['id'])
+        vazio = False
+
+    if vazio == False:
+        info_cid = cid.get_cid_by_id(info['cid']['id'])
+        cid_id = info_cid['id']
+        cid_name = info_cid['name']
+    else:
+        cid_id = ''
+        cid_name = ''
+
+    # info_cid = cid.get_cid_by_id(info['cid']['id'])
+    # cid_id = info_cid['id']
+    # cid_name = info_cid['name']
     local_id = 0
     local_name = ''
     dose = str(info['dose']).upper()
@@ -506,36 +525,69 @@ def appointments_update(info):
 
     cur = conection.conn.cursor()
 
-    cur.execute("""
-        UPDATE
-        public.appointment_complete
-        SET
-            medicine = %s,
-            hospital_id = %s, 
-            hospital_name = %s, 
-            created_on = %s, 
-            cid_id = %s, 
-            cid_name = %s, 
-            local_id = %s, 
-            local_name = %s, 
-            dose = %s,
-            medicine_item_name = %s, 
-            doctor_id = %s, 
-            doctor_name = %s, 
-            doctor_specialty = %s, 
-            doctor_cpf = %s, 
-            doctor_atention_id = %s, 
-            doctor_atention_name = %s,
-            doctor_atention_specialty = %s, 
-            doctor_atention_cpf = %s, 
-            attention_number = %s,
-            covenant = %s
-        WHERE id = %s""", (medicines, hospital_id, hospital_name, created_on, cid_id, cid_name, local_id, local_name,
-                           dose, medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf,
-                           doctor_atention_id, doctor_atention_name, doctor_atention_specialty, doctor_atention_cpf,
-                           attention_number,covenant, info['id']))
-    conection.conn.commit()
-    cur.close()
+    if cid_id == '':
+        cur.execute("""
+            UPDATE
+            public.appointment_complete
+            SET
+                medicine = %s,
+                hospital_id = %s, 
+                hospital_name = %s, 
+                created_on = %s, 
+               
+                cid_name = %s, 
+                local_id = %s, 
+                local_name = %s, 
+                dose = %s,
+                medicine_item_name = %s, 
+                doctor_id = %s, 
+                doctor_name = %s, 
+                doctor_specialty = %s, 
+                doctor_cpf = %s, 
+                doctor_atention_id = %s, 
+                doctor_atention_name = %s,
+                doctor_atention_specialty = %s, 
+                doctor_atention_cpf = %s, 
+                attention_number = %s,
+                covenant = %s
+            WHERE id = %s""", (medicines, hospital_id, hospital_name, created_on, cid_name, local_id, local_name,
+                               dose, medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf,
+                               doctor_atention_id, doctor_atention_name, doctor_atention_specialty, doctor_atention_cpf,
+                               attention_number,covenant, info['id']))
+        conection.conn.commit()
+        cur.close()
+    else:
+        cur.execute("""
+                UPDATE
+                public.appointment_complete
+                SET
+                    medicine = %s,
+                    hospital_id = %s, 
+                    hospital_name = %s, 
+                    created_on = %s, 
+                    cid_id = %s, 
+                    cid_name = %s, 
+                    local_id = %s, 
+                    local_name = %s, 
+                    dose = %s,
+                    medicine_item_name = %s, 
+                    doctor_id = %s, 
+                    doctor_name = %s, 
+                    doctor_specialty = %s, 
+                    doctor_cpf = %s, 
+                    doctor_atention_id = %s, 
+                    doctor_atention_name = %s,
+                    doctor_atention_specialty = %s, 
+                    doctor_atention_cpf = %s, 
+                    attention_number = %s,
+                    covenant = %s
+                WHERE id = %s""",
+                    (medicines, hospital_id, hospital_name, created_on, cid_id, cid_name, local_id, local_name,
+                     dose, medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf,
+                     doctor_atention_id, doctor_atention_name, doctor_atention_specialty, doctor_atention_cpf,
+                     attention_number, covenant, info['id']))
+        conection.conn.commit()
+        cur.close()
 
 
 def appointments_update_v2(info):
@@ -1158,6 +1210,8 @@ def get_data_appointments_by_id(id):
 
 def appointments_search(info):
     payload = []
+    print(len(info), 'data')
+    # if info is None:
     if len(info) == 1:
         cur = conection.conn.cursor()
         cur.execute("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name,
@@ -1292,6 +1346,30 @@ def appointments_search(info):
         # created_on
         # BETWEEN
         # '2021-11-23' and '2021-11-23'
+
+        # cur = conection.conn.cursor()
+        # cur.execute("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name ,created_on
+        #                            FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
+        #             condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
+        #             str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
+        # records = cur.fetchall()
+        # cur.close()
+        # content = {}
+        # for i in records:
+        #     print('date', i[6].strftime("%Y-%m-%d %H:%M:%S"))
+        #     content = {
+        #         'newPatient': False,
+        #         'attentionNumber': i[1],
+        #         'patient': i[2],
+        #         'doctor': i[3],
+        #         'doctorPatient': i[4],
+        #         'hospital': i[5],
+        #         'createdOn': str(i[6].strftime("%d/%m/%Y %H:%M")),
+        #         'id': i[0],
+        #     }
+        #     payload.append(content)
+        #     content = {}
+        # return payload
 
         try:
             cur = conection.conn.cursor()
