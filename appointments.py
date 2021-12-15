@@ -1739,9 +1739,20 @@ def appointments_download_by_id(id):
 
 #Mobile
 def insert_appointments_mobile(info, token):
+    # {'patient': {'id': 129},
+    # 'cid': {'id': ''},
+    # 'medicineItem': {'name': 'ACTEMRA EV'},
+    # 'attentionNumber': '090909090',
+    # 'date': '2021-12-15T05:23:38.527Z',
+    # 'dose': '1 al dia',
+    # 'local': {'id': ''},
+    # 'covenant': '',
+    # 'doctorPatient': 12,
+    # 'hospital': {'id': 7},
+    # 'otherPhotos': []}
 
     print("INSERTANDO APPOINTMENT! ")
-    print(info)
+    print(info, 'INFO')
     patient_info = patients.get_info_patients(info['patient']['id'])
     version = 0
     patient_id = patient_info['id']
@@ -1754,6 +1765,17 @@ def insert_appointments_mobile(info, token):
     hospital_info = hospitals.get_hospital_by_id(info['hospital']['id'])
     hospital_id = hospital_info['id']
     hospital_name = hospital_info['name']
+
+    # patient_id = patient_info['id']
+    # patient_name = patient_info['name'].upper()
+    # patient_medical_record = patient_info['attentionNumber'].upper()
+    # patient_covenat = patient_info['covenant'].upper()
+    # patient_cpf = patient_info['cpf']
+    # patient_phone = patient_info['phone']
+    # medicines = info['medicineItem']['name'].upper()
+    # hospital_info = hospitals.get_hospital_by_id(info['hospital']['id'])
+    # hospital_id = hospital_info['id']
+    # hospital_name = hospital_info['name']
 
     info_user = validate_token(token, True)
     login_user_id = info_user['id']

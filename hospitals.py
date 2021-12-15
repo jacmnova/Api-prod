@@ -114,7 +114,6 @@ def get_hospital_data(info):
     cur.execute("""SELECT id, medicine_item_name, dose, cid_name,data_last_atendimineto, local_id FROM public.appointment_history WHERE patient_id = %s""",
                 str(info_patients['id']))
     records = cur.fetchall()
-    print(records)
 
     # "07/06/1989"
     if len(records) > 0:
@@ -217,7 +216,7 @@ def get_hospital_data(info):
 def get_hospital_by_id(id):
     content = {}
     cur = conection.conn.cursor()
-    cur.execute("""SELECT * FROM public.hospital WHERE id = """ + str(id))
+    cur.execute("""SELECT id, "version", "name", audit_id, status FROM public.hospital WHERE id = """ + str(id))
     records = cur.fetchall()
     cur.close()
 

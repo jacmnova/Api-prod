@@ -186,7 +186,25 @@ def get_patients():
 
 def get_info_patients(id):
     cur = conection.conn.cursor()
-    cur.execute("""SELECT * FROM public.patient WHERE id = """ + str(id))
+    cur.execute("""SELECT 
+    id,
+    "version",
+    phone,
+    hospital_id,
+    login_user_id,
+    cid_id,
+    covenant,
+    local_id,
+    "name",
+    audit_id,
+    creation_date,
+    status,
+    medical_record,
+    cpf,
+    birth_date,
+    medical_type,
+    doctor_id
+     FROM public.patient WHERE id = """ + str(id))
     records = cur.fetchall()
 
     cur.close()
