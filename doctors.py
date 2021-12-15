@@ -88,41 +88,59 @@ def get_doctors():
     return payload
 
 def get_doctors_by_id(id):
-    cur = conection.conn.cursor()
-    cur.execute("""SELECT * FROM public.doctor WHERE id = """ + str(id))
-    records = cur.fetchall()
-    cur.close()
-    contentd = {}
-    # id,
-    # "version",
-    # crm,
-    # specialty,
-    # "name",
-    # audit_id,
-    # status,
-    # cpf
-    for result in records:
-        # contentd = {
-        #     "id": result[0],
-        #     "version": result[1],
-        #     "crm": result[2],
-        #     "specialty": result[3],
-        #     "name": result[4],
-        #     "audit_id": result[5],
-        #     "status": result[6],
-        #     "cpf": result[7],
-        # }
-        contentd = {
-            "id": result[0],
-            "cpf": result[7],
-            "specialty": {
-                'name': result[3],
-            },
-            "status": result[6],
-            "name": result[4],
+    if id is not None:
+        try:
+            cur = conection.conn.cursor()
+            cur.execute("""SELECT id, "version", crm, specialty, "name", audit_id, status, cpf FROM public.doctor WHERE id = """ + str(id))
+            records = cur.fetchall()
+            cur.close()
+            contentd = {}
+            # id,
+            # "version",
+            # crm,
+            # specialty,
+            # "name",
+            # audit_id,
+            # status,
+            # cpf
+            for result in records:
+                # contentd = {
+                #     "id": result[0],
+                #     "version": result[1],
+                #     "crm": result[2],
+                #     "specialty": result[3],
+                #     "name": result[4],
+                #     "audit_id": result[5],
+                #     "status": result[6],
+                #     "cpf": result[7],
+                # }
+                contentd = {
+                    "id": result[0],
+                    "cpf": result[7],
+                    "specialty": {
+                        'name': result[3],
+                    },
+                    "status": result[6],
+                    "name": result[4],
 
-        }
-    return contentd
+                }
+            return contentd
+        except:
+            curs = conection.conn.cursor()
+            curs.execute("ROLLBACK")
+            conection.conn.commit()
+            curs.close()
+            contentd = {
+                "id": '',
+                "cpf": '',
+                "specialty": {
+                    'name': '',
+                },
+                "status": '',
+                "name": '',
+
+            }
+            return contentd
 
 def get_doctors_by_id_v2(id):
     cur = conection.conn.cursor()
