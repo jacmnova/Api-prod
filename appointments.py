@@ -1224,36 +1224,20 @@ def appointments_search(info):
             info_doctor = doctors.get_doctors_by_id(i[7])
             info_doctorPatient = doctors.get_doctors_by_id(i[8])
             info_hospital = hospitals.get_hospital_by_id(i[9])
-            try:
-                content = {
-                    'newPatient': False,
-                    'attentionNumber': i[1],
-                    'patient': i[2],
-                    'doctor': i[3],
-                    'doctorStatus': info_doctor['status'],
-                    'doctorPatient': i[4],
-                    'patientDoctorStatus': info_doctorPatient['status'],
-                    'hospital': i[5],
-                    'hospitalStatus': info_hospital['status'],
-                    'createdOn': i[6].strftime("%d/%m/%Y %H:%M"),
-                    'id': i[0],
-                }
-                payload.append(content)
-            except:
-                content = {
-                    'newPatient': False,
-                    'attentionNumber': i[1],
-                    'patient': i[2],
-                    'doctor': i[3],
-                    'doctorStatus': info_doctor['status'],
-                    'doctorPatient': i[4],
-                    'patientDoctorStatus': '',
-                    'hospital': i[5],
-                    'hospitalStatus': info_hospital['status'],
-                    'createdOn': i[6].strftime("%d/%m/%Y %H:%M"),
-                    'id': i[0],
-                }
-                payload.append(content)
+            content = {
+                'newPatient': False,
+                'attentionNumber': i[1],
+                'patient': i[2],
+                'doctor': i[3],
+                'doctorStatus': info_doctor['status'],
+                'doctorPatient': i[4],
+                'patientDoctorStatus': info_doctorPatient['status'],
+                'hospital': i[5],
+                'hospitalStatus': info_hospital['status'],
+                'createdOn': i[6].strftime("%d/%m/%Y %H:%M"),
+                'id': i[0],
+            }
+            payload.append(content)
             content = {}
         return payload
 

@@ -141,6 +141,22 @@ def get_doctors_by_id(id):
 
             }
             return contentd
+    else:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        contentd = {
+            "id": '',
+            "cpf": '',
+            "specialty": {
+                'name': '',
+            },
+            "status": '',
+            "name": '',
+
+        }
+        return contentd
 
 def get_doctors_by_id_v2(id):
     cur = conection.conn.cursor()
