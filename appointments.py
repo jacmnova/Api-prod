@@ -1895,7 +1895,10 @@ def insert_appointments_mobile(info, token):
     patient_id = patient_info['id']
     patient_name = patient_info['name'].upper()
     patient_medical_record = patient_info['attentionNumber'].upper()
-    patient_covenat = patient_info['covenant'].upper()
+    if patient_info['covenant'] is not None:
+        patient_covenat = patient_info['covenant'].upper()
+    else:
+        patient_covenat = ''
     patient_cpf = patient_info['cpf']
     patient_phone = patient_info['phone']
     medicines = info['medicineItem']['name'].upper()
