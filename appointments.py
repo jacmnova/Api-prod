@@ -1956,9 +1956,12 @@ def insert_appointments_mobile(info, token):
     my_date = info['date']
     # 2021 - 11 - 06T01: 14:16.420 - 04: 00
     cr_date = datetime.datetime.strptime(my_date, '%Y-%m-%dT%H:%M:%S.%f%z')
-    cr_date = cr_date.strftime("%Y-%m-%dT%H:%M:%S")
-    created_on = cr_date
+    print(cr_date)
+    date = cr_date.astimezone(pytz.timezone('America/Sao_Paulo'))
 
+    cr_date = cr_date.strftime("%Y-%m-%dT%H:%M:%S")
+    created_on = date.strftime("%Y-%m-%dT%H:%M:%S")
+    print(created_on)
 
     if cid_id == '':
         try:

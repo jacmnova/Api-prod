@@ -52,7 +52,7 @@ def save_user(data):
                             enabled = %s, 
                             app_type = %s, 
                             role_user = %s 
-                          WHERE id = %s""", (updated_on, account_locked, name, status, enabled, app_type, role_user,
+                          WHERE id = %s""", (updated_on, account_locked, name.upper(), status, enabled, app_type, role_user,
                                              exist['id']))
             # conection.conn.commit()
             cur.close()
