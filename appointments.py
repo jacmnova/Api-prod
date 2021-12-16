@@ -1118,12 +1118,14 @@ def get_data():
     return content
 
 def get_data_appointments_by_id(id):
+    print(id, 'ID')
     cur = conection.conn.cursor()
     cur.execute("""SELECT attention_number, cid_id, cid_name, covenant, patient_cpf,
                           created_on, doctor_name, doctor_id, doctor_atention_name, doctor_atention_id,
                           dose, hospital_id, id, medicine_item_name, patient_name
                            FROM public.appointment_complete WHERE id = """ + str(id))
     records = cur.fetchall()
+    print(records)
     cur.close()
     content = {}
 
@@ -1138,6 +1140,7 @@ def get_data_appointments_by_id(id):
 
     if len(records) != 0:
         cids = {}
+        print(records[0][1])
         if records[0][1] is None:
             content = {
                 'id': [''],
@@ -1148,6 +1151,7 @@ def get_data_appointments_by_id(id):
         else:
             cids = cid.get_cid_by_id(records[0][1])
 
+
         doctor_presciptor = doctors.get_doctors_by_id_v2(records[0][7])
         doctor = doctors.get_doctors_by_id_v2(records[0][9])
 
@@ -1156,6 +1160,7 @@ def get_data_appointments_by_id(id):
             myPatient = True
 
         medicines = medicine.get_medicine_by_name(records[0][13])
+        print(medicines)
 
         createdOn = records[0][5].strftime("%Y-%m-%dT%H:%M:%S.%f%z")
         date = records[0][5].strftime("%Y-%m-%dT%H:%M:%S.%f%z")
@@ -1924,7 +1929,11 @@ def insert_appointments_mobile(info, token):
         cid_id = info_cid['id']
         cid_name = info_cid['name']
 
-    covenant = patient_info['covenant'].upper()
+
+    if patient_info['covenant'] is not None:
+        covenant = patient_info['covenant'].upper()
+    else:
+        covenant = ''
 
 
     local_id = 0

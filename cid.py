@@ -40,9 +40,11 @@ def save_cid(auth, token):
         return False
 
 def get_cid_by_id(id):
+    print("CID", id)
     cur = conection.conn.cursor()
     cur.execute("""SELECT id, name, status FROM public.cid WHERE id = """ + str(id))
     records = cur.fetchall()
+    print(records)
     content = {}
     for i in records:
         content = {
