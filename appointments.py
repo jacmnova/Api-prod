@@ -1754,61 +1754,67 @@ def appointments_search_download(info):
         # BETWEEN
         # '2021-11-23' and '2021-11-23'
 
-
-        cur = conection.conn.cursor()
-        cur.execute("""SELECT attention_number,
-                        patient_name, 
-                        patient_medical_record, 
-                        patient_covenat, 
-                        patient_cpf, 
-                        patient_phone, 
-                        medicine, 
-                        hospital_name, 
-                        created_on, 
-                        cid_id, 
-                        cid_name, 
-                        covenant, 
-                        local_name, 
-                        medicine_item_name, 
-                        dose, 
-                        doctor_name, 
-                        doctor_specialty, 
-                        doctor_cpf, 
-                        doctor_atention_name, 
-                        doctor_atention_specialty, 
-                        doctor_atention_cpf
-                       FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
-                    condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
-                    str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
-        records = cur.fetchall()
-        cur.close()
-        content = {}
-        for i in records:
-            content = {
-                'attention_number': i[0],
-                'patient_name': i[1],
-                'patient_medical_record': i[2],
-                'patient_covenat': i[3],
-                'patient_cpf': i[4],
-                'patient_phone': i[5],
-                'medicine': i[6],
-                'hospital_name': i[7],
-                'created_on': i[8].strftime("%Y/%m/%d %H:%M:%S"),
-                'cid_name': i[10],
-                'covenant': i[11],
-                'local_name': i[12],
-                'medicine_item_name': i[13],
-                'dose': i[14],
-                'doctor_name': i[15],
-                'doctor_specialty': i[16],
-                'doctor_cpf': i[17],
-                'doctor_atention_name': i[18],
-                'doctor_atention_specialty': i[19],
-                'doctor_atention_cpf': i[20],
-            }
-            payload.append(content)
+        try:
+            cur = conection.conn.cursor()
+            cur.execute("""SELECT attention_number,
+                            patient_name, 
+                            patient_medical_record, 
+                            patient_covenat, 
+                            patient_cpf, 
+                            patient_phone, 
+                            medicine, 
+                            hospital_name, 
+                            created_on, 
+                            cid_id, 
+                            cid_name, 
+                            covenant, 
+                            local_name, 
+                            medicine_item_name, 
+                            dose, 
+                            doctor_name, 
+                            doctor_specialty, 
+                            doctor_cpf, 
+                            doctor_atention_name, 
+                            doctor_atention_specialty, 
+                            doctor_atention_cpf
+                           FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
+                        condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
+                        str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
+            records = cur.fetchall()
+            cur.close()
             content = {}
-        return payload
+            for i in records:
+                content = {
+                    'attention_number': i[0],
+                    'patient_name': i[1],
+                    'patient_medical_record': i[2],
+                    'patient_covenat': i[3],
+                    'patient_cpf': i[4],
+                    'patient_phone': i[5],
+                    'medicine': i[6],
+                    'hospital_name': i[7],
+                    'created_on': i[8].strftime("%Y/%m/%d %H:%M:%S"),
+                    'cid_name': i[10],
+                    'covenant': i[11],
+                    'local_name': i[12],
+                    'medicine_item_name': i[13],
+                    'dose': i[14],
+                    'doctor_name': i[15],
+                    'doctor_specialty': i[16],
+                    'doctor_cpf': i[17],
+                    'doctor_atention_name': i[18],
+                    'doctor_atention_specialty': i[19],
+                    'doctor_atention_cpf': i[20],
+                }
+                payload.append(content)
+                content = {}
+            return payload
+        except:
+            curs = conection.conn.cursor()
+            curs.execute("ROLLBACK")
+            conection.conn.commit()
+            curs.close()
+            return payload
     return
 
 def appointments_download_by_id(id):
