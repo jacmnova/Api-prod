@@ -185,111 +185,52 @@ def insert_history(info):
     records = cur.fetchone()
     if records is None:
         if info['cid_id'] == '':
-            cur.execute("""
-            INSERT INTO public.appointment_history
-                ("version", patient_id, patient_name, patient_medical_record, patient_covenat, 
-                patient_cpf, doctor_id, doctor_name, doctor_specialty, doctor_cpf, local_id, local_name, 
-                hospital_id, hospital_name, cid_name, medicine_item_id, medicine_item_name, 
-                dose, nro_atendimiento, data_last_atendimineto)
-            VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
-                info['version'],
-                str(info['patient_id']),
-                info['patient_name'],
-                info['patient_medical_record'],
-                info['patient_covenat'],
-                str(info['patient_cpf']),
-                str(info['doctor_id']),
-                info['doctor_name'],
-                info['doctor_specialty'],
-                str(info['doctor_cpf']),
-                str(info['local_id']),
-                info['local_name'],
-                str(info['hospital_id']),
-                info['hospital_name'],
-                info['cid_name'],
-                str(medicine_item_id),
-                info['medicine_item_name'],
-                info['dose'],
-                1,
-                info['created_on']
-            ))
-            conection.conn.commit()
-            cur.close()
+            try:
+                cur.execute("""
+                INSERT INTO public.appointment_history
+                    ("version", patient_id, patient_name, patient_medical_record, patient_covenat, 
+                    patient_cpf, doctor_id, doctor_name, doctor_specialty, doctor_cpf, local_id, local_name, 
+                    hospital_id, hospital_name, cid_name, medicine_item_id, medicine_item_name, 
+                    dose, nro_atendimiento, data_last_atendimineto)
+                VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
+                    info['version'],
+                    str(info['patient_id']),
+                    info['patient_name'],
+                    info['patient_medical_record'],
+                    info['patient_covenat'],
+                    str(info['patient_cpf']),
+                    str(info['doctor_id']),
+                    info['doctor_name'],
+                    info['doctor_specialty'],
+                    str(info['doctor_cpf']),
+                    str(info['local_id']),
+                    info['local_name'],
+                    str(info['hospital_id']),
+                    info['hospital_name'],
+                    info['cid_name'],
+                    str(medicine_item_id),
+                    info['medicine_item_name'],
+                    info['dose'],
+                    1,
+                    info['created_on']
+                ))
+                conection.conn.commit()
+                cur.close()
+            except:
+                curs = conection.conn.cursor()
+                curs.execute("ROLLBACK")
+                conection.conn.commit()
+                curs.close()
+                return False
         else:
-            cur.execute("""
-                    INSERT INTO public.appointment_history
-                        ("version", patient_id, patient_name, patient_medical_record, patient_covenat, 
-                        patient_cpf, doctor_id, doctor_name, doctor_specialty, doctor_cpf, local_id, local_name, 
-                        hospital_id, hospital_name, cid_id, cid_name, medicine_item_id, medicine_item_name, 
-                        dose, nro_atendimiento, data_last_atendimineto)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
-                info['version'],
-                str(info['patient_id']),
-                info['patient_name'],
-                info['patient_medical_record'],
-                info['patient_covenat'],
-                str(info['patient_cpf']),
-                str(info['doctor_id']),
-                info['doctor_name'],
-                info['doctor_specialty'],
-                str(info['doctor_cpf']),
-                str(info['local_id']),
-                info['local_name'],
-                str(info['hospital_id']),
-                info['hospital_name'],
-                str(info['cid_id']),
-                info['cid_name'],
-                str(medicine_item_id),
-                info['medicine_item_name'],
-                info['dose'],
-                1,
-                info['created_on']
-            ))
-            conection.conn.commit()
-            cur.close()
-        set_active(info['patient_id'])
-    else:
-        print("update")
-        if info['cid_id'] == '':
-            cur.execute("""
-                            UPDATE public.appointment_history
-                            SET "version"=%s, patient_id=%s, patient_name=%s, patient_medical_record=%s, patient_covenat=%s, 
-                                 patient_cpf=%s, doctor_id=%s, doctor_name=%s, doctor_specialty=%s, doctor_cpf=%s, local_id=%s, 
-                                 local_name=%s, hospital_id=%s, hospital_name=%s, cid_id=NULL, cid_name=%s, medicine_item_id=%s, 
-                                 medicine_item_name=%s, dose=%s, nro_atendimiento = nro_atendimiento::int + 1, data_last_atendimineto=%s
-                            WHERE patient_id=%s """, (
-                info['version'],
-                str(info['patient_id']),
-                info['patient_name'],
-                info['patient_medical_record'],
-                info['patient_covenat'],
-                str(info['patient_cpf']),
-                str(info['doctor_id']),
-                info['doctor_name'],
-                info['doctor_specialty'],
-                str(info['doctor_cpf']),
-                str(info['local_id']),
-                info['local_name'],
-                str(info['hospital_id']),
-                info['hospital_name'],
-                info['cid_name'],
-                str(medicine_item_id),
-                info['medicine_item_name'],
-                info['dose'],
-                info['created_on'],
-                str(info['patient_id'])
-            ))
-            conection.conn.commit()
-            cur.close()
-
-        else:
-            cur.execute("""
-                UPDATE public.appointment_history
-                SET "version"=%s, patient_id=%s, patient_name=%s, patient_medical_record=%s, patient_covenat=%s, 
-                     patient_cpf=%s, doctor_id=%s, doctor_name=%s, doctor_specialty=%s, doctor_cpf=%s, local_id=%s, 
-                     local_name=%s, hospital_id=%s, hospital_name=%s, cid_id=%s, cid_name=%s, medicine_item_id=%s, 
-                     medicine_item_name=%s, dose=%s, nro_atendimiento = nro_atendimiento::int + 1, data_last_atendimineto=%s
-                WHERE patient_id=%s """, (
+            try:
+                cur.execute("""
+                        INSERT INTO public.appointment_history
+                            ("version", patient_id, patient_name, patient_medical_record, patient_covenat, 
+                            patient_cpf, doctor_id, doctor_name, doctor_specialty, doctor_cpf, local_id, local_name, 
+                            hospital_id, hospital_name, cid_id, cid_name, medicine_item_id, medicine_item_name, 
+                            dose, nro_atendimiento, data_last_atendimineto)
+                        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);""", (
                     info['version'],
                     str(info['patient_id']),
                     info['patient_name'],
@@ -309,19 +250,114 @@ def insert_history(info):
                     str(medicine_item_id),
                     info['medicine_item_name'],
                     info['dose'],
+                    1,
+                    info['created_on']
+                ))
+                conection.conn.commit()
+                cur.close()
+                set_active(info['patient_id'])
+            except:
+                curs = conection.conn.cursor()
+                curs.execute("ROLLBACK")
+                conection.conn.commit()
+                curs.close()
+                return False
+
+    else:
+        print("update")
+        if info['cid_id'] == '':
+            try:
+                cur.execute("""
+                                UPDATE public.appointment_history
+                                SET "version"=%s, patient_id=%s, patient_name=%s, patient_medical_record=%s, patient_covenat=%s, 
+                                     patient_cpf=%s, doctor_id=%s, doctor_name=%s, doctor_specialty=%s, doctor_cpf=%s, local_id=%s, 
+                                     local_name=%s, hospital_id=%s, hospital_name=%s, cid_id=NULL, cid_name=%s, medicine_item_id=%s, 
+                                     medicine_item_name=%s, dose=%s, nro_atendimiento = nro_atendimiento::int + 1, data_last_atendimineto=%s
+                                WHERE patient_id=%s """, (
+                    info['version'],
+                    str(info['patient_id']),
+                    info['patient_name'],
+                    info['patient_medical_record'],
+                    info['patient_covenat'],
+                    str(info['patient_cpf']),
+                    str(info['doctor_id']),
+                    info['doctor_name'],
+                    info['doctor_specialty'],
+                    str(info['doctor_cpf']),
+                    str(info['local_id']),
+                    info['local_name'],
+                    str(info['hospital_id']),
+                    info['hospital_name'],
+                    info['cid_name'],
+                    str(medicine_item_id),
+                    info['medicine_item_name'],
+                    info['dose'],
                     info['created_on'],
                     str(info['patient_id'])
-            ))
-            conection.conn.commit()
-            cur.close()
-        set_active(info['patient_id'])
+                ))
+                conection.conn.commit()
+                cur.close()
+            except:
+                curs = conection.conn.cursor()
+                curs.execute("ROLLBACK")
+                conection.conn.commit()
+                curs.close()
+                return False
+
+        else:
+            try:
+                cur.execute("""
+                    UPDATE public.appointment_history
+                    SET "version"=%s, patient_id=%s, patient_name=%s, patient_medical_record=%s, patient_covenat=%s, 
+                         patient_cpf=%s, doctor_id=%s, doctor_name=%s, doctor_specialty=%s, doctor_cpf=%s, local_id=%s, 
+                         local_name=%s, hospital_id=%s, hospital_name=%s, cid_id=%s, cid_name=%s, medicine_item_id=%s, 
+                         medicine_item_name=%s, dose=%s, nro_atendimiento = nro_atendimiento::int + 1, data_last_atendimineto=%s
+                    WHERE patient_id=%s """, (
+                        info['version'],
+                        str(info['patient_id']),
+                        info['patient_name'],
+                        info['patient_medical_record'],
+                        info['patient_covenat'],
+                        str(info['patient_cpf']),
+                        str(info['doctor_id']),
+                        info['doctor_name'],
+                        info['doctor_specialty'],
+                        str(info['doctor_cpf']),
+                        str(info['local_id']),
+                        info['local_name'],
+                        str(info['hospital_id']),
+                        info['hospital_name'],
+                        str(info['cid_id']),
+                        info['cid_name'],
+                        str(medicine_item_id),
+                        info['medicine_item_name'],
+                        info['dose'],
+                        info['created_on'],
+                        str(info['patient_id'])
+                ))
+                conection.conn.commit()
+                cur.close()
+                set_active(info['patient_id'])
+            except:
+                curs = conection.conn.cursor()
+                curs.execute("ROLLBACK")
+                conection.conn.commit()
+                curs.close()
+                return False
     return
 
 def set_active(info):
-    cur = conection.conn.cursor()
-    cur.execute("UPDATE public.patient SET status='ACTIVE' WHERE id = " + str(info))
-    conection.conn.commit()
-    cur.close()
+    try:
+        cur = conection.conn.cursor()
+        cur.execute("UPDATE public.patient SET status='ACTIVE' WHERE id = " + str(info))
+        conection.conn.commit()
+        cur.close()
+    except:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        return False
     return
 
 def appointments_set(info):
@@ -1207,39 +1243,57 @@ def get_data_appointments_by_id(id):
     return content
 
 
-
 def appointments_search(info):
     payload = []
-    print(len(info), 'data')
     # if info is None:
     if len(info) == 1:
-        cur = conection.conn.cursor()
-        cur.execute("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name,
-                        created_on, doctor_id, doctor_atention_id, hospital_id
-                       FROM public.appointment_complete ORDER BY created_on desc""")
-        records = cur.fetchall()
-        cur.close()
-        content = {}
-        for i in records:
-            info_doctor = doctors.get_doctors_by_id(i[7])
-            info_doctorPatient = doctors.get_doctors_by_id(i[8])
-            info_hospital = hospitals.get_hospital_by_id(i[9])
-            content = {
-                'newPatient': False,
-                'attentionNumber': i[1],
-                'patient': i[2],
-                'doctor': i[3],
-                'doctorStatus': info_doctor['status'],
-                'doctorPatient': i[4],
-                'patientDoctorStatus': info_doctorPatient['status'],
-                'hospital': i[5],
-                'hospitalStatus': info_hospital['status'],
-                'createdOn': i[6].strftime("%d/%m/%Y %H:%M"),
-                'id': i[0],
-            }
-            payload.append(content)
+        try:
+            cur = conection.conn.cursor()
+            cur.execute("""SELECT 
+                            app.id, 
+                            app.attention_number, 
+                            app.patient_name, 
+                            app.doctor_name, 
+                            app.doctor_atention_name, 
+                            app.hospital_name,
+                            app.created_on, 
+                            d.status as status_doctor, 
+                            p.status as status_atention_doctor, 
+                            h.status as status_hospital
+                           FROM public.appointment_complete app
+                           join public.doctor d on app.doctor_id = d.id 
+                           join public.doctor p on app.doctor_atention_id = p.id 
+                           join public.hospital h on app.hospital_id = h.id 
+                           ORDER BY created_on desc""")
+            records = cur.fetchall()
+            cur.close()
             content = {}
-        return payload
+            for i in records:
+                # info_doctor = doctors.get_doctors_by_id(i[7])
+                # info_doctorPatient = doctors.get_doctors_by_id(i[8])
+                # info_hospital = hospitals.get_hospital_by_id(i[9])
+                content = {
+                    'newPatient': False,
+                    'attentionNumber': i[1],
+                    'patient': i[2],
+                    'doctor': i[3],
+                    'doctorStatus': i[7],
+                    'doctorPatient': i[4],
+                    'patientDoctorStatus': i[8],
+                    'hospital': i[5],
+                    'hospitalStatus': i[9],
+                    'createdOn': i[6].strftime("%d/%m/%Y %H:%M"),
+                    'id': i[0],
+                }
+                payload.append(content)
+                content = {}
+            return payload
+        except:
+            curs = conection.conn.cursor()
+            curs.execute("ROLLBACK")
+            conection.conn.commit()
+            curs.close()
+            return payload
 
     else:
 
@@ -1843,17 +1897,6 @@ def insert_appointments_mobile(info, token):
     hospital_id = hospital_info['id']
     hospital_name = hospital_info['name']
 
-    # patient_id = patient_info['id']
-    # patient_name = patient_info['name'].upper()
-    # patient_medical_record = patient_info['attentionNumber'].upper()
-    # patient_covenat = patient_info['covenant'].upper()
-    # patient_cpf = patient_info['cpf']
-    # patient_phone = patient_info['phone']
-    # medicines = info['medicineItem']['name'].upper()
-    # hospital_info = hospitals.get_hospital_by_id(info['hospital']['id'])
-    # hospital_id = hospital_info['id']
-    # hospital_name = hospital_info['name']
-
     info_user = validate_token(token, True)
     login_user_id = info_user['id']
     cid_id = ''
@@ -1915,47 +1958,63 @@ def insert_appointments_mobile(info, token):
     cr_date = datetime.datetime.strptime(my_date, '%Y-%m-%dT%H:%M:%S.%f%z')
     cr_date = cr_date.strftime("%Y-%m-%dT%H:%M:%S")
     created_on = cr_date
-    cur = conection.conn.cursor()
+
 
     if cid_id == '':
-        cur.execute("""
-                    INSERT
-                    INTO
-                    public.appointment_complete
-                    ("version", patient_id, patient_name, patient_medical_record, patient_covenat, patient_cpf, patient_phone, medicine,
-                     hospital_id, hospital_name, login_user_id, created_on, covenant, local_id, local_name, dose,
-                     medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf, doctor_atention_id, doctor_atention_name,
-                     doctor_atention_specialty, doctor_atention_cpf, attention_number)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                    """, (
+        try:
+            cur = conection.conn.cursor()
+            cur.execute("""
+                        INSERT
+                        INTO
+                        public.appointment_complete
+                        ("version", patient_id, patient_name, patient_medical_record, patient_covenat, patient_cpf, patient_phone, medicine,
+                         hospital_id, hospital_name, login_user_id, created_on, covenant, local_id, local_name, dose,
+                         medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf, doctor_atention_id, doctor_atention_name,
+                         doctor_atention_specialty, doctor_atention_cpf, attention_number)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                        """, (
+                version, patient_id, patient_name, patient_medical_record, patient_covenat, patient_cpf, patient_phone,
+                medicines,
+                hospital_id, hospital_name, login_user_id, created_on, covenant, local_id, local_name,
+                dose,
+                medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf, doctor_atention_id,
+                doctor_atention_name,
+                doctor_atention_specialty, doctor_atention_cpf, attention_number))
+            conection.conn.commit()
+            cur.close()
+        except:
+            curs = conection.conn.cursor()
+            curs.execute("ROLLBACK")
+            conection.conn.commit()
+            curs.close()
+            return False
+    else:
+        try:
+            cur = conection.conn.cursor()
+            cur.execute("""
+                   INSERT
+                   INTO
+                   public.appointment_complete
+                   ("version", patient_id, patient_name, patient_medical_record, patient_covenat, patient_cpf, patient_phone, medicine,
+                    hospital_id, hospital_name, login_user_id, created_on, cid_id, cid_name, covenant, local_id, local_name, dose,
+                    medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf, doctor_atention_id, doctor_atention_name,
+                    doctor_atention_specialty, doctor_atention_cpf, attention_number)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                   """, (
             version, patient_id, patient_name, patient_medical_record, patient_covenat, patient_cpf, patient_phone,
             medicines,
-            hospital_id, hospital_name, login_user_id, created_on, covenant, local_id, local_name,
-            dose,
+            hospital_id, hospital_name, login_user_id, created_on, cid_id, cid_name, covenant, local_id, local_name, dose,
             medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf, doctor_atention_id,
             doctor_atention_name,
             doctor_atention_specialty, doctor_atention_cpf, attention_number))
-        conection.conn.commit()
-        cur.close()
-    else:
-        cur.execute("""
-               INSERT
-               INTO
-               public.appointment_complete
-               ("version", patient_id, patient_name, patient_medical_record, patient_covenat, patient_cpf, patient_phone, medicine,
-                hospital_id, hospital_name, login_user_id, created_on, cid_id, cid_name, covenant, local_id, local_name, dose,
-                medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf, doctor_atention_id, doctor_atention_name,
-                doctor_atention_specialty, doctor_atention_cpf, attention_number)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-               """, (
-        version, patient_id, patient_name, patient_medical_record, patient_covenat, patient_cpf, patient_phone,
-        medicines,
-        hospital_id, hospital_name, login_user_id, created_on, cid_id, cid_name, covenant, local_id, local_name, dose,
-        medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf, doctor_atention_id,
-        doctor_atention_name,
-        doctor_atention_specialty, doctor_atention_cpf, attention_number))
-        conection.conn.commit()
-        cur.close()
+            conection.conn.commit()
+            cur.close()
+        except:
+            curs = conection.conn.cursor()
+            curs.execute("ROLLBACK")
+            conection.conn.commit()
+            curs.close()
+            return False
 
 
 
@@ -2067,7 +2126,7 @@ def appointments_by_user_mobile(token, type):
             #     payload.append(content)
             #     content = {}
             #
-            # return payload
+            # return payload            try:
             cur = conection.conn.cursor()
             cur.execute("""SELECT 
                                         attention_number, created_on, doctor_name, id, 

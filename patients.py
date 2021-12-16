@@ -286,179 +286,187 @@ def get_v2():
 
 def get_info_patient(id):
     print(id)
-    cur = conection.conn.cursor()
-    cur.execute("""
-    SELECT 
-    p.id, 
-    p.name, 
-    p.phone,
-    p.medical_record, 
-    p.covenant, 
-    p.cpf, 
-    p.birth_date, 
-    p.creation_date, 
-    p.doctor_id, 
-    d."name", 
-    d.status,
-    p.local_id, p.iskid FROM public.patient p  join doctor d ON doctor_id = d.id WHERE p.id = """ + str(id))
-    records = cur.fetchall()
+    content = {}
+    try:
+        cur = conection.conn.cursor()
+        cur.execute("""
+        SELECT 
+        p.id, 
+        p.name, 
+        p.phone,
+        p.medical_record, 
+        p.covenant, 
+        p.cpf, 
+        p.birth_date, 
+        p.creation_date, 
+        p.doctor_id, 
+        d."name", 
+        d.status,
+        p.local_id, p.iskid FROM public.patient p  join doctor d ON doctor_id = d.id WHERE p.id = """ + str(id))
+        records = cur.fetchall()
 
 
-    cur.execute("""SELECT medicine_item_name, dose, cid_id FROM public.appointment_history WHERE patient_id = """ + str(id))
-    data = cur.fetchone()
-    cur.close()
+        cur.execute("""SELECT medicine_item_name, dose, cid_id FROM public.appointment_history WHERE patient_id = """ + str(id))
+        data = cur.fetchone()
+        cur.close()
 
-    medicine_item_name = ''
-    dose = ''
-    cid_id = ''
-    if data is None:
         medicine_item_name = ''
         dose = ''
         cid_id = ''
-    else:
-        medicine_item_name = data[0]
-        dose = data[1]
-        cid_id = data[2]
+        if data is None:
+            medicine_item_name = ''
+            dose = ''
+            cid_id = ''
+        else:
+            medicine_item_name = data[0]
+            dose = data[1]
+            cid_id = data[2]
 
-    cur.close()
-    content = {}
-    # 16 / 11 / 2021
-    menor = False
-    if len(records) == 0:
-        cur = conection.conn.cursor()
-        cur.execute("""SELECT 
-                        p.id, 
-                        p.name, 
-                        p.phone,
-                        p.medical_record, 
-                        p.covenant, 
-                        p.cpf, 
-                        p.birth_date, 
-                        p.creation_date, 
-                        p.doctor_id, 
-                        p.local_id, p.iskid FROM public.patient p WHERE p.id =  """ + str(id))
-        records = cur.fetchall()
         cur.close()
-        local_name = ''
-        for i in records:
-            if i[9] is not None:
-                aux_local = local.get_locals_by_id(i[11])
-                print(aux_local)
-                if len(aux_local) > 0:
-                    local_name = aux_local[0]['name']
+        content = {}
+        # 16 / 11 / 2021
+        menor = False
+        if len(records) == 0:
+            cur = conection.conn.cursor()
+            cur.execute("""SELECT 
+                            p.id, 
+                            p.name, 
+                            p.phone,
+                            p.medical_record, 
+                            p.covenant, 
+                            p.cpf, 
+                            p.birth_date, 
+                            p.creation_date, 
+                            p.doctor_id, 
+                            p.local_id, p.iskid FROM public.patient p WHERE p.id =  """ + str(id))
+            records = cur.fetchall()
+            cur.close()
+            local_name = ''
+            for i in records:
+                if i[9] is not None:
+                    aux_local = local.get_locals_by_id(i[11])
+                    print(aux_local)
+                    if len(aux_local) > 0:
+                        local_name = aux_local[0]['name']
 
-            if i[5] is None:
-                menor = True
+                if i[5] is None:
+                    menor = True
 
-            if i[6]:
-                birthDate = i[6].strftime("%d/%m/%Y")
-            else:
-                birthDate = ''
+                if i[6]:
+                    birthDate = i[6].strftime("%d/%m/%Y")
+                else:
+                    birthDate = ''
 
-            if i[7]:
-                creationDate = i[7].strftime("%d/%m/%Y")
-            else:
-                creationDate = ''
+                if i[7]:
+                    creationDate = i[7].strftime("%d/%m/%Y")
+                else:
+                    creationDate = ''
 
-            doctor_id = ''
-            doctor_status = ''
-            doctor_doctorName = ''
+                doctor_id = ''
+                doctor_status = ''
+                doctor_doctorName = ''
 
-            if i[8] is not None:
-                doctor = doctors.get_doctors_by_id(i[8])
-                doctor_id = doctor['id']
-                doctor_status = doctor['status']
-                doctor_doctorName = doctor['name']
-                # "id": result[0],
-                # "cpf": result[7],
-                # "specialty": {
-                #     'name': result[3],
-                # },
-                # "status": result[6],
-                # "name": result[4],
+                if i[8] is not None:
+                    doctor = doctors.get_doctors_by_id(i[8])
+                    doctor_id = doctor['id']
+                    doctor_status = doctor['status']
+                    doctor_doctorName = doctor['name']
+                    # "id": result[0],
+                    # "cpf": result[7],
+                    # "specialty": {
+                    #     'name': result[3],
+                    # },
+                    # "status": result[6],
+                    # "name": result[4],
 
-            content = {
-                'id': i[0],
-                'name': i[1],
-                'phone': i[2],
-                'attentionNumber': i[3],
-                'covenant': i[4],
-                'cpf': i[5],
-                'birthDateStr': birthDate,
-                'createdOn': creationDate,
-                'doctor': {
-                    'id': doctor_id,
-                    'status': doctor_status,
-                    'doctorName': doctor_doctorName
-                },
-                'menor': menor,
-                'cid': {
-                    'id': cid_id
-                },
-                'lastInfo': {
-                    'dose': dose,
-                    'medicineItem': {
-                        'name': medicine_item_name
-                    }
-                },
-                'local': {
-                    'name': local_name
-                },
-                'isKid': i[10]
+                content = {
+                    'id': i[0],
+                    'name': i[1],
+                    'phone': i[2],
+                    'attentionNumber': i[3],
+                    'covenant': i[4],
+                    'cpf': i[5],
+                    'birthDateStr': birthDate,
+                    'createdOn': creationDate,
+                    'doctor': {
+                        'id': doctor_id,
+                        'status': doctor_status,
+                        'doctorName': doctor_doctorName
+                    },
+                    'menor': menor,
+                    'cid': {
+                        'id': cid_id
+                    },
+                    'lastInfo': {
+                        'dose': dose,
+                        'medicineItem': {
+                            'name': medicine_item_name
+                        }
+                    },
+                    'local': {
+                        'name': local_name
+                    },
+                    'isKid': i[10]
 
-            }
-    else:
-        local_name = ''
-        for i in records:
-            if i[11] is not None:
-                aux_local = local.get_locals_by_id(i[11])
-                print(aux_local)
-                if len(aux_local) > 0:
-                    local_name = aux_local[0]['name']
+                }
+        else:
+            local_name = ''
+            for i in records:
+                if i[11] is not None:
+                    aux_local = local.get_locals_by_id(i[11])
+                    print(aux_local)
+                    if len(aux_local) > 0:
+                        local_name = aux_local[0]['name']
 
-            if i[5] is None:
-                menor = True
+                if i[5] is None:
+                    menor = True
 
-            if (i[6]):
-                birthDate = i[6].strftime("%d/%m/%Y")
-            else:
-                birthDate = ''
+                if (i[6]):
+                    birthDate = i[6].strftime("%d/%m/%Y")
+                else:
+                    birthDate = ''
 
-            if (i[7]):
-                creationDate = i[7].strftime("%d/%m/%Y")
-            else:
-                creationDate = ''
+                if (i[7]):
+                    creationDate = i[7].strftime("%d/%m/%Y")
+                else:
+                    creationDate = ''
 
-            content = {
-                'id': i[0],
-                'name': i[1],
-                'phone': i[2],
-                'attentionNumber': i[3],
-                'covenant': i[4],
-                'cpf': i[5],
-                'birthDateStr': birthDate,
-                'createdOn': creationDate,
-                'doctor': {
-                    'id': i[8],
-                    'status': i[10],
-                    'doctorName': i[9]
-                },
-                'menor': menor,
-                'cid': {
-                    'id': cid_id
-                },
-                'lastInfo': {
-                    'dose': dose,
-                    'medicineItem': {
-                        'name': medicine_item_name
-                    }
-                },
-                'local': {
-                    'name': local_name
-                },
-                'isKid': i[12]
+                content = {
+                    'id': i[0],
+                    'name': i[1],
+                    'phone': i[2],
+                    'attentionNumber': i[3],
+                    'covenant': i[4],
+                    'cpf': i[5],
+                    'birthDateStr': birthDate,
+                    'createdOn': creationDate,
+                    'doctor': {
+                        'id': i[8],
+                        'status': i[10],
+                        'doctorName': i[9]
+                    },
+                    'menor': menor,
+                    'cid': {
+                        'id': cid_id
+                    },
+                    'lastInfo': {
+                        'dose': dose,
+                        'medicineItem': {
+                            'name': medicine_item_name
+                        }
+                    },
+                    'local': {
+                        'name': local_name
+                    },
+                    'isKid': i[12]
 
-            }
+                }
+    except:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        return False
 
     return content
 
