@@ -1925,7 +1925,7 @@ def insert_appointments_mobile(info, token):
     medicine_item_name = str(info['medicineItem']['name']).upper()
 
     info_doctor = doctors.get_doctors_by_id(patient_info['doctor_id'])
-    doctor_id = info_doctor['id']
+    doctor_id = patient_info['doctor_id']
     doctor_name = info_doctor['name']
 
     try:

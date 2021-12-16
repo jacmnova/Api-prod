@@ -91,29 +91,19 @@ def get_doctors_by_id(id):
     if id is not None:
         try:
             cur = conection.conn.cursor()
-            cur.execute("""SELECT id, "version", crm, specialty, "name", audit_id, status, cpf FROM public.doctor WHERE id = """ + str(id))
+            cur.execute("""SELECT  id, 
+                                   "version", 
+                                   crm, 
+                                   specialty_id, 
+                                   "name", 
+                                   audit_id, 
+                                   status, 
+                                   cpf FROM public.doctor WHERE id = """ + str(id))
             records = cur.fetchall()
             cur.close()
             contentd = {}
-            # id,
-            # "version",
-            # crm,
-            # specialty,
-            # "name",
-            # audit_id,
-            # status,
-            # cpf
+
             for result in records:
-                # contentd = {
-                #     "id": result[0],
-                #     "version": result[1],
-                #     "crm": result[2],
-                #     "specialty": result[3],
-                #     "name": result[4],
-                #     "audit_id": result[5],
-                #     "status": result[6],
-                #     "cpf": result[7],
-                # }
                 contentd = {
                     "id": result[0],
                     "cpf": result[7],
