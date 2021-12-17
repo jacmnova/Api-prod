@@ -586,9 +586,24 @@ def appointments_update(info):
                 doctor_atention_cpf = %s, 
                 attention_number = %s,
                 covenant = %s
-            WHERE id = %s""", (medicines, hospital_id, hospital_name, created_on, cid_name, local_id, local_name,
-                               dose, medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf,
-                               doctor_atention_id, doctor_atention_name, doctor_atention_specialty, doctor_atention_cpf,
+            WHERE id = %s""", (medicines,
+                               hospital_id,
+                               hospital_name,
+                               created_on,
+                               cid_name,
+                               local_id,
+                               local_name,
+                               dose,
+                               medicine_item_name,
+                               doctor_atention_id,
+                               doctor_atention_name,
+                               doctor_atention_specialty,
+                               doctor_atention_cpf,
+                               doctor_id,
+                               doctor_name,
+                               doctor_specialty,
+                               doctor_cpf,
+
                                attention_number,covenant, info['id']))
         conection.conn.commit()
         cur.close()
@@ -618,9 +633,25 @@ def appointments_update(info):
                     attention_number = %s,
                     covenant = %s
                 WHERE id = %s""",
-                    (medicines, hospital_id, hospital_name, created_on, cid_id, cid_name, local_id, local_name,
-                     dose, medicine_item_name, doctor_id, doctor_name, doctor_specialty, doctor_cpf,
-                     doctor_atention_id, doctor_atention_name, doctor_atention_specialty, doctor_atention_cpf,
+                    (medicines,
+                     hospital_id,
+                     hospital_name,
+                     created_on,
+                     cid_id,
+                     cid_name,
+                     local_id,
+                     local_name,
+                     dose,
+                     medicine_item_name,
+                     doctor_atention_id,
+                     doctor_atention_name,
+                     doctor_atention_specialty,
+                     doctor_atention_cpf,
+                     doctor_id,
+                     doctor_name,
+                     doctor_specialty,
+                     doctor_cpf,
+
                      attention_number, covenant, info['id']))
         conection.conn.commit()
         cur.close()
@@ -1149,6 +1180,7 @@ def get_data_appointments_by_id(id):
             }
             cids = content
         else:
+            print("dentro", records[0][1])
             cids = cid.get_cid_by_id(records[0][1])
 
 
