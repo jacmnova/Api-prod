@@ -1167,41 +1167,57 @@ def get_data_appointments_by_id(id):
         dateIOS = records[0][5].strftime("%Y-%m-%dT%H:%M:%SZ")
         dateStr = str(records[0][5].strftime("%Y-%m-%d %H:%M:%S"))
         for i in records:
-            if cids['status'] == "DELETED":
-                cid_id = ''
-                cid_name = ''
-                cid_status = ''
-            else:
-                cid_id = cids['id'],
-                cid_name = cids['name'],
-                cid_status = cids['status']
+            cid_id = cids['id'],
+            cid_name = cids['name'],
+            cid_status = cids['status']
 
-            if medicines['status'] == "DELETED":
-                medicines_name = ''
-                medicines_status = ''
-                medicines_id = ''
-            else:
-                medicines_name = medicines['name']
-                medicines_status = medicines['status']
-                medicines_id = medicines['id']
+            medicines_name = medicines['name']
+            medicines_status = medicines['status']
+            medicines_id = medicines['id']
 
-            if doctor_presciptor['status'] == "DELETED":
-                doctor_presciptor_name = ''
-                doctor_presciptor_status = ''
-                doctor_presciptor_id = ''
-            else:
-                doctor_presciptor_name = doctor_presciptor['name'],
-                doctor_presciptor_status = doctor_presciptor['status'],
-                doctor_presciptor_id = doctor_presciptor['id']
+            doctor_presciptor_name = doctor_presciptor['name'],
+            doctor_presciptor_status = doctor_presciptor['status'],
+            doctor_presciptor_id = doctor_presciptor['id']
 
-            if doctor['status'] == "DELETED":
-                doctor_name = ''
-                doctor_status = ''
-                doctor_id = ''
-            else:
-                doctor_name = doctor['name'],
-                doctor_status = doctor['status'],
-                doctor_id = doctor['id']
+            doctor_name = doctor['name'],
+            doctor_status = doctor['status'],
+            doctor_id = doctor['id']
+
+            # if cids['status'] == "DELETED":
+            #     cid_id = ''
+            #     cid_name = ''
+            #     cid_status = ''
+            # else:
+            #     cid_id = cids['id'],
+            #     cid_name = cids['name'],
+            #     cid_status = cids['status']
+            #
+            # if medicines['status'] == "DELETED":
+            #     medicines_name = ''
+            #     medicines_status = ''
+            #     medicines_id = ''
+            # else:
+            #     medicines_name = medicines['name']
+            #     medicines_status = medicines['status']
+            #     medicines_id = medicines['id']
+            #
+            # if doctor_presciptor['status'] == "DELETED":
+            #     doctor_presciptor_name = ''
+            #     doctor_presciptor_status = ''
+            #     doctor_presciptor_id = ''
+            # else:
+            #     doctor_presciptor_name = doctor_presciptor['name'],
+            #     doctor_presciptor_status = doctor_presciptor['status'],
+            #     doctor_presciptor_id = doctor_presciptor['id']
+            #
+            # if doctor['status'] == "DELETED":
+            #     doctor_name = ''
+            #     doctor_status = ''
+            #     doctor_id = ''
+            # else:
+            #     doctor_name = doctor['name'],
+            #     doctor_status = doctor['status'],
+            #     doctor_id = doctor['id']
 
 
             content = {
