@@ -1914,8 +1914,20 @@ def insert_appointments_mobile(info, token):
     patient_info = patients.get_info_patients(info['patient']['id'])
     version = 0
     patient_id = patient_info['id']
-    patient_name = patient_info['name'].upper()
-    patient_medical_record = patient_info['attentionNumber'].upper()
+
+
+
+    if patient_info['name'] is not None:
+        patient_name = patient_info['name'].upper()
+    else:
+        patient_name = ''
+
+
+    if patient_info['attentionNumber'] is not None:
+        patient_medical_record = patient_info['attentionNumber'].upper()
+    else:
+        patient_medical_record = ''
+
     if patient_info['covenant'] is not None:
         patient_covenat = patient_info['covenant'].upper()
     else:
