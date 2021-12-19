@@ -1529,21 +1529,65 @@ def suporte():
     payload = []
     content = {}
     for i in records:
-        print(i)
+        # print(i)
+        if i[6] > 0:
+            vDoctor = doctors.get_doctors_by_id(i[12])
+            vCid = cid.get_cid_by_id(i[8])
+            vMedicine = medicine.get_medicine_by_id(i[9])
+            vHospital = hospitals.get_hospital_by_id(i[10])
+
+
+            doctor = ''
+            doctorid = ''
+            cidName = ''
+            cid_id = ''
+            medicineName = ''
+            medicineId = ''
+            hospitalName = ''
+            hospitalId = ''
+
+            if vDoctor['status'] == 'DELETED':
+                doctor = ''
+                doctorid = ''
+            else:
+                doctor = i[1]
+                doctorid = i[12]
+
+            if vCid['status'] == 'DELETED':
+                cidName = ''
+                cid_id = ''
+            else:
+                cidName = i[3]
+                cid_id = i[8]
+
+            if vMedicine['status'] == 'DELETED':
+                medicineName = ''
+                medicineId = ''
+            else:
+                medicineName = i[4]
+                medicineId = i[9]
+
+            if vHospital['status'] == 'DELETED':
+                hospitalName = ''
+                hospitalId = ''
+            else:
+                hospitalName = i[2]
+                hospitalId = i[10]
+
         content = {
             "patientName": i[0],
-            "doctorName": i[1],
-            "hospitalName": i[2],
-            "cidName": i[3],
-            "medicineName": i[4],
+            "doctorName": doctor,
+            "hospitalName": hospitalName,
+            "cidName": cidName,
+            "medicineName": medicineName,
             "dose": i[5],
             "nroAtendimiento": i[6],
             "id": i[7],
-            'cidId': i[8],
-            'medicineId': i[9],
-            'hospitalId': i[10],
+            'cidId': cid_id,
+            'medicineId': medicineId,
+            'hospitalId': hospitalId,
             'lastAtention': i[11],
-            'doctorId': i[12]
+            'doctorId': doctorid
         }
         payload.append(content)
         content = {}
