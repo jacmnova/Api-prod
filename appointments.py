@@ -1531,11 +1531,6 @@ def suporte():
     for i in records:
         # print(i)
         if i[6] > 0:
-            vDoctor = doctors.get_doctors_by_id(i[12])
-            vCid = cid.get_cid_by_id(i[8])
-            vMedicine = medicine.get_medicine_by_id(i[9])
-            vHospital = hospitals.get_hospital_by_id(i[10])
-
 
             doctor = ''
             doctorid = ''
@@ -1546,49 +1541,73 @@ def suporte():
             hospitalName = ''
             hospitalId = ''
 
-            if vDoctor['status'] == 'DELETED':
-                doctor = ''
-                doctorid = ''
-            else:
-                doctor = i[1]
-                doctorid = i[12]
+            if i[12] is not None:
+                vDoctor = doctors.get_doctors_by_id(i[12])
+                if vDoctor['status'] == 'DELETED':
+                    doctor = ''
+                    doctorid = ''
+                else:
+                    doctor = i[1]
+                    doctorid = i[12]
+            if i[8] is not None:
+                vCid = cid.get_cid_by_id(i[8])
+                if vCid['status'] == 'DELETED':
+                    cidName = ''
+                    cid_id = ''
+                else:
+                    cidName = i[3]
+                    cid_id = i[8]
+            if i[9] is not None:
+                vMedicine = medicine.get_medicine_by_id(i[9])
+                if vMedicine['status'] == 'DELETED':
+                    medicineName = ''
+                    medicineId = ''
+                else:
+                    medicineName = i[4]
+                    medicineId = i[9]
+            if i[10] is not None:
+                vHospital = hospitals.get_hospital_by_id(i[10])
+                if vHospital['status'] == 'DELETED':
+                    hospitalName = ''
+                    hospitalId = ''
+                else:
+                    hospitalName = i[2]
+                    hospitalId = i[10]
 
-            if vCid['status'] == 'DELETED':
-                cidName = ''
-                cid_id = ''
-            else:
-                cidName = i[3]
-                cid_id = i[8]
+            content = {
+                "patientName": i[0],
+                "doctorName": doctor,
+                "hospitalName": hospitalName,
+                "cidName": cidName,
+                "medicineName": medicineName,
+                "dose": i[5],
+                "nroAtendimiento": i[6],
+                "id": i[7],
+                'cidId': cid_id,
+                'medicineId': medicineId,
+                'hospitalId': hospitalId,
+                'lastAtention': i[11],
+                'doctorId': doctorid
+            }
 
-            if vMedicine['status'] == 'DELETED':
-                medicineName = ''
-                medicineId = ''
-            else:
-                medicineName = i[4]
-                medicineId = i[9]
+        else:
 
-            if vHospital['status'] == 'DELETED':
-                hospitalName = ''
-                hospitalId = ''
-            else:
-                hospitalName = i[2]
-                hospitalId = i[10]
+            content = {
+                "patientName": i[0],
+                "doctorName": i[1],
+                "hospitalName": i[2],
+                "cidName": i[3],
+                "medicineName": i[4],
+                "dose": i[5],
+                "nroAtendimiento": i[6],
+                "id": i[7],
+                'cidId': i[8],
+                'medicineId': i[9],
+                'hospitalId': i[10],
+                'lastAtention': i[11],
+                'doctorId': i[12]
+            }
 
-        content = {
-            "patientName": i[0],
-            "doctorName": doctor,
-            "hospitalName": hospitalName,
-            "cidName": cidName,
-            "medicineName": medicineName,
-            "dose": i[5],
-            "nroAtendimiento": i[6],
-            "id": i[7],
-            'cidId': cid_id,
-            'medicineId': medicineId,
-            'hospitalId': hospitalId,
-            'lastAtention': i[11],
-            'doctorId': doctorid
-        }
         payload.append(content)
         content = {}
 
