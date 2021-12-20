@@ -560,9 +560,28 @@ def get_info_patient_mobile(id):
         dose = ''
         cid_id = ''
     else:
-        medicine_item_name = data[0]
+        if data[0] is not None:
+            medicine_info = medicine.get_medicine_by_name(data[0])
+            print("Verificando medicina")
+            if medicine_info['status'] == 'DELETED':
+                medicine_item_name = ''
+            else:
+                medicine_item_name = data[0]
+        else:
+            medicine_item_name = data[0]
+
+
+        if data[2] is not None:
+            cid_info = cid.get_cid_by_id(data[2])
+
+            print("Verificando CID")
+            if cid_info['status'] == 'DELETED':
+                cid_id = ''
+            else:
+                cid_id = data[2]
+        else:
+            cid_id = data[2]
         dose = data[1]
-        cid_id = data[2]
 
     cur.close()
     content = {}
