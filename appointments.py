@@ -1385,6 +1385,8 @@ def appointments_search(info):
             if (info['hospital']):
                 print("Estoy buscando por hospital")
                 condition_hospital = " hospital_id = " + str(info['hospital']['id'])
+                if condition_hospital != "":
+                    coma_hopsital = ' AND '
                 where = " where "
         except:
             print("Hospital not working")
@@ -1441,9 +1443,9 @@ def appointments_search(info):
             date_time_to = datetime.datetime.now()
             where = " where "
             create_date = " created_on BETWEEN "
-            condition_dateFrom = "'" + str(date_time_obj) + "'"
+            condition_dateFrom = " '" + str(date_time_obj) + "' "
             coma_dateFrom = " AND "
-            condition_dateTo = "'" + str(date_time_to) + "'"
+            condition_dateTo = " '" + str(date_time_to) + "' "
         except:
             print("date not workiing")
 
@@ -1452,10 +1454,10 @@ def appointments_search(info):
             date_time_obj = datetime.datetime.strptime(info['to'],'%d/%m/%Y')
             create_date = " created_on::DATE BETWEEN "
             if condition_dateFrom == "":
-                condition_dateFrom = "'" + str(date_time_obj) +  "'"
+                condition_dateFrom = " '" + str(date_time_obj) +  "' "
 
             coma_dateFrom = " AND "
-            condition_dateTo = "'" + str(date_time_obj) +  "'"
+            condition_dateTo = " '" + str(date_time_obj) +  "' "
         except:
             print("date not workiing")
 
@@ -1494,6 +1496,10 @@ def appointments_search(info):
 
         try:
             cur = conection.conn.cursor()
+            print("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name ,created_on
+                           FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
+                        condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
+                        str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
             cur.execute("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name ,created_on
                            FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
                         condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
