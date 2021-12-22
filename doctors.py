@@ -65,7 +65,7 @@ def save_doctors(data):
 
 def get_doctors():
     cur = conection.conn.cursor()
-    cur.execute(""" SELECT "id", "name", specialty_id, cpf FROM public.doctor  WHERE status = 'ACTIVE' ORDER BY "id" ASC """)
+    cur.execute(""" SELECT "id", "name", specialty_id, cpf FROM public.doctor  WHERE status = 'ACTIVE' ORDER BY "name" ASC """)
     records = cur.fetchall()
     cur.close()
     payload = []
