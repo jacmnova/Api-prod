@@ -1203,17 +1203,32 @@ def get_data_appointments_by_id(id):
             cid_name = cids['name'],
             cid_status = cids['status']
 
-            medicines_name = medicines['name']
-            medicines_status = medicines['status']
-            medicines_id = medicines['id']
+            try:
+                medicines_name = medicines['name']
+                medicines_status = medicines['status']
+                medicines_id = medicines['id']
+            except:
+                medicines_name = ''
+                medicines_status = ''
+                medicines_id = ''
 
-            doctor_presciptor_name = doctor_presciptor['name'],
-            doctor_presciptor_status = doctor_presciptor['status'],
-            doctor_presciptor_id = doctor_presciptor['id']
+            try:
+                doctor_presciptor_name = doctor_presciptor['name'],
+                doctor_presciptor_status = doctor_presciptor['status'],
+                doctor_presciptor_id = doctor_presciptor['id']
+            except:
+                doctor_presciptor_name = ''
+                doctor_presciptor_status = ''
+                doctor_presciptor_id = ''
 
-            doctor_name = doctor['name'],
-            doctor_status = doctor['status'],
-            doctor_id = doctor['id']
+            try:
+                doctor_name = doctor['name'],
+                doctor_status = doctor['status'],
+                doctor_id = doctor['id']
+            except:
+                doctor_name = ''
+                doctor_status = ''
+                doctor_id = ''
 
             # if cids['status'] == "DELETED":
             #     cid_id = ''
