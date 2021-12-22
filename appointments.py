@@ -2308,18 +2308,18 @@ def appointments_by_user_mobile(token, type):
                 content = {
                     'attentionNumber': data[0],
                     'createdOn': created_on,
-                    'doctor': info_doctor_prescriptor['name'],
+                    'doctor': info_doctor_platonista['name'],
                     'doctorStatus': {
                         'enumType': "cobra.api.emuns.common.GenericStatus",
-                        'name': info_doctor_prescriptor['status']
+                        'name': info_doctor_platonista['status']
                     },
                     'id': data[3],
                     'local': data[4],
                     'patient': data[5],
-                    'patientDoctor': info_doctor_prescriptor['name'],
+                    'patientDoctor': info_doctor_platonista['name'],
                     'patientDoctorStatus': {
                         'enumType': "cobra.api.emuns.common.GenericStatus",
-                        'name': info_doctor_prescriptor['status']
+                        'name': info_doctor_platonista['status']
                     }
                 }
                 payload.append(content)
