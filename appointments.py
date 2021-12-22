@@ -1496,19 +1496,19 @@ def appointments_search(info):
         # return payload
 
 
-        if condition_hospital != "" and condition_doctor == "" and condition_prescriptor == "" and condition_patient == "" and condition_cpf == "":
+        if condition_hospital != "" and condition_doctor == "" and condition_prescriptor == "" and condition_patient == "" and condition_cpf == "" and condition_dateFrom == "":
             coma_hopsital = ""
 
-        if condition_doctor != "" and condition_hospital == "" and condition_prescriptor == "" and condition_patient == "" and condition_cpf == "":
+        if condition_doctor != "" and condition_hospital == "" and condition_prescriptor == "" and condition_patient == "" and condition_cpf == "" and condition_dateFrom == "":
             coma_doctor = ""
 
-        if condition_prescriptor != "" and condition_doctor == "" and condition_hospital == "" and condition_patient == "" and condition_cpf == "":
+        if condition_prescriptor != "" and condition_doctor == "" and condition_hospital == "" and condition_patient == "" and condition_cpf == "" and condition_dateFrom == "":
             coma_prescriptor = ""
 
-        if condition_patient != "" and condition_doctor == "" and condition_prescriptor == "" and condition_hospital == "" and condition_cpf == "":
+        if condition_patient != "" and condition_doctor == "" and condition_prescriptor == "" and condition_hospital == "" and condition_cpf == "" and condition_dateFrom == "":
             coma_patient = ""
 
-        if condition_cpf != "" and condition_doctor == "" and condition_prescriptor == "" and condition_patient == "" and condition_hospital == "":
+        if condition_cpf != "" and condition_doctor == "" and condition_prescriptor == "" and condition_patient == "" and condition_hospital == "" and condition_dateFrom == "":
             coma_cpf = ""
 
         try:
