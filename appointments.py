@@ -1495,6 +1495,22 @@ def appointments_search(info):
         #     content = {}
         # return payload
 
+
+        if condition_hospital != "" and condition_doctor == "" and condition_prescriptor == "" and condition_patient == "" and condition_cpf == "":
+            coma_hopsital = ""
+
+        if condition_doctor != "" and condition_hospital == "" and condition_prescriptor == "" and condition_patient == "" and condition_cpf == "":
+            coma_doctor = ""
+
+        if condition_prescriptor != "" and condition_doctor == "" and condition_hospital == "" and condition_patient == "" and condition_cpf == "":
+            coma_prescriptor = ""
+
+        if condition_patient != "" and condition_doctor == "" and condition_prescriptor == "" and condition_hospital == "" and condition_cpf == "":
+            coma_patient = ""
+
+        if condition_cpf != "" and condition_doctor == "" and condition_prescriptor == "" and condition_patient == "" and condition_hospital == "":
+            coma_cpf = ""
+
         try:
             cur = conection.conn.cursor()
             print("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name ,created_on
