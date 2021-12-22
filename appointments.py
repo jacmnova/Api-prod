@@ -1378,6 +1378,7 @@ def appointments_search(info):
         coma_patient = ""
 
         condition_cpf = ""
+        coma_cpf = ""
         where = ""
         # {'hospital': {'id': 3}, 'doctor': {'id': 3}, 'prescriptor': {'id': 1}, 'cpf': '123.123.123-12',
         #  'from': '23/11/2021', 'to': '23/11/2021'
@@ -1395,8 +1396,8 @@ def appointments_search(info):
             if (info['doctor']):
                 print("Estoy buscando por doctor")
                 condition_doctor = " doctor_id = " + str(info['doctor']['id'])
-                if condition_hospital != "":
-                    coma_hopsital = ' AND '
+                if condition_doctor != "":
+                    coma_doctor = ' AND '
                 where = " where "
         except:
             print("Hospital not working")
@@ -1405,8 +1406,8 @@ def appointments_search(info):
             if (info['prescriptor']):
                 print("Estoy buscando por doctor")
                 condition_prescriptor = " doctor_atention_id = " + str(info['prescriptor']['id'])
-                if condition_doctor != "":
-                    coma_doctor = ' AND '
+                if condition_prescriptor != "":
+                    coma_prescriptor = ' AND '
                 where = " where "
         except:
             print("Hospital not working")
@@ -1415,8 +1416,8 @@ def appointments_search(info):
             if (info['patient']):
                 print("Estoy buscando por patient")
                 condition_patient = " patient_id = " + str(info['patient']['id'])
-                if condition_prescriptor != "":
-                    coma_prescriptor = ' AND '
+                if condition_patient != "":
+                    coma_patient = ' AND '
                 where = " where "
         except:
             print("Hospital not working")
@@ -1425,8 +1426,8 @@ def appointments_search(info):
             if (info['cpf']):
                 print("Estoy buscando por doctor")
                 condition_cpf = " patient_cpf = '" + str(info['cpf'] + "'")
-                if condition_patient != "":
-                    coma_patient = ' AND '
+                if condition_cpf != "":
+                    coma_cpf = ' AND '
                 where = " where "
         except:
             print("Hospital not working")
@@ -1500,9 +1501,11 @@ def appointments_search(info):
                            FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
                         condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
                         str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
+
+
             cur.execute("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name ,created_on
                            FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
-                        condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
+                        condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + coma_cpf +  create_date +
                         str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
             records = cur.fetchall()
             cur.close()
