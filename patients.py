@@ -149,8 +149,9 @@ def get_patients():
     cur = conection.conn.cursor()
     cur = conection.conn.cursor()
     cur.execute(""" SELECT q1.id, q1."name", q1.medical_record, q1.cpf, q1.covenant, q1.doctor_id, doctor."name" AS doctor_name
-                    FROM public.doctor as doctor, (SELECT id, "name", medical_record, cpf, covenant, doctor_id FROM public.patient) AS q1 
-                    WHERE doctor.id = q1.doctor_id order by "name" asc """)
+                    FROM public.doctor as doctor, (SELECT id, "name", medical_record, cpf, covenant, doctor_id 
+                                                    FROM public.patient WHERE status != 'DELETED') AS q1 
+                    WHERE doctor.id = q1.doctor_id  order by "name" asc """)
     records = cur.fetchall()
     print(records)
     cur.close()

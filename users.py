@@ -226,7 +226,8 @@ def encrypt_pass(temporal_password):
 def verify_user(username, password):
     try:
         cur = conection.conn.cursor()
-        cur.execute("""SELECT password FROM public.login_user WHERE account_locked != true and username = '""" + username + """'""")
+        cur.execute("""SELECT password FROM public.login_user WHERE account_locked != true and status != 'DEACTIVATED' 
+                        and username = '""" + username + """'""")
         result = cur.fetchall()
         cur.close()
         encrypt = result[0][0]
