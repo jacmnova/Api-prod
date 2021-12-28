@@ -95,17 +95,25 @@ def get_medicine_by_name(name):
         return content
 
 def get_medicine_by_id(id):
-    cur = conection.conn.cursor()
-    cur.execute("""SELECT id, name, status FROM public.medicine WHERE id = """ + str(id))
-    records = cur.fetchall()
-    content = {}
-    for i in records:
-        content = {
-            'id': i[0],
-            'name': i[1],
-            'status': i[2],
-        }
-    return content
+    try:
+        cur = conection.conn.cursor()
+        cur.execute("""SELECT id, name, status FROM public.medicine WHERE id = """ + str(id))
+        records = cur.fetchall()
+        content = {}
+        for i in records:
+            content = {
+                'id': i[0],
+                'name': i[1],
+                'status': i[2],
+            }
+        return content
+    except:
+        content = {}
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        return content
 
 def put_medicine(info):
     try:

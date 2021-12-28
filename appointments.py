@@ -1541,7 +1541,7 @@ def appointments_delete(info):
 def suporte():
     cur = conection.conn.cursor()
     cur.execute("""SELECT patient_name, doctor_name, hospital_name, cid_name, medicine_item_name, dose, nro_atendimiento,
-                    id, cid_id, medicine_item_id, hospital_id, data_last_atendimineto, doctor_id 
+                    id, cid_id, medicine_item_id, hospital_id, data_last_atendimineto, doctor_id, patient_id
                     FROM public.appointment_history  ORDER BY patient_name asc""")
     records = cur.fetchall()
     cur.close()
@@ -1594,6 +1594,7 @@ def suporte():
                     hospitalId = i[10]
 
             content = {
+                "patientId": i[13],
                 "patientName": i[0],
                 "doctorName": doctor,
                 "hospitalName": hospitalName,
@@ -1612,6 +1613,7 @@ def suporte():
         else:
 
             content = {
+                "patientId": i[13],
                 "patientName": i[0],
                 "doctorName": i[1],
                 "hospitalName": i[2],
@@ -1633,6 +1635,7 @@ def suporte():
     return payload
 
 def suporte_update(info):
+    print(info)
     # cidId: 1
     # doctorId: 26
     # dose: "1 AL DIA"
@@ -1648,11 +1651,21 @@ def suporte_update(info):
     hospital_data = hospitals.get_hospital_by_id(info['hospitalId'])
     medicine_data = medicine.get_medicine_by_id(info['medicineId'])
 
-    print(cid_data)
-    print(doctor_data)
-    print(dose)
-    print(hospital_data)
-    print(medicine_data)
+    medicine_data_id = ''
+    medicine_data_name = ''
+    if medicine_data != {}:
+        medicine_data_id = medicine_data['id']
+        medicine_data_name = medicine_data['name']
+
+    # {'patientName': 'ADRIANA ROSA FERRAZ DE SANTANA', 'dose': '1 AL DIA', 'id': 3, 'cidId': 14, 'medicineId': 66,
+    #  'hospitalId': 10, 'lastAtention': 'Fri, 17 Dec 2021 10:27:55 GMT', 'nroAtention': '', 'doctorId': 33}
+    #patientId
+    # UPDATE
+    # public.patient
+    # SET
+    # "version" = 0, phone = '', hospital_id = 0, login_user_id = 0, cid_id = 0, covenant = '', local_id = 0, name = '', audit_id = 0, creation_date = '', status = '', medical_record = '', cpf = '', birth_date = '', medical_type = '', doctor_id = 0, iskid = false
+    # WHERE
+    # id = 0;
 
     # {'id': 1, 'name': 'M0512312', 'status': 'DELETE'}
     # {'id': 26, 'cpf': None, 'specialty': {'name': None}, 'status': 'ACTIVE', 'name': 'Jayme Fogagnolo Cobra'}
@@ -1682,9 +1695,11 @@ def suporte_update(info):
                         doctor_data['cpf'],
                         hospital_data['id'],
                         hospital_data['name'],
-                        medicine_data['id'],
-                        medicine_data['name'],
+                        medicine_data_id,
+                        medicine_data_name,
                         dose, info['id']))
+        conection.conn.commit()
+        cur.execute("""UPDATE public.patient SET doctor_id = %s WHERE id = %s; """, (info['doctorId'], info['patientId']))
         conection.conn.commit()
         cur.close()
         return True
