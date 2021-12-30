@@ -2259,52 +2259,7 @@ def appointments_by_user_mobile(token, type):
     # print(info, 'info')
     if info:
         if type['type'] == 'MY_PATIENTS':
-            # payload = []
-            # content = {}
-            #
-            # #PACIENTES
-            # cur = conection.conn.cursor()
-            # cur.execute("""SELECT
-            #                 medical_type,
-            #                 creation_date,
-            #                 id,
-            #                 local_id,
-            #                 "name",
-            #                 status,
-            #                 doctor_id,
-            #                 medical_record
-            #                FROM public.patient WHERE doctor_id = """ + str(info['doctor_id']) + """ORDER BY creation_date desc""")
-            # records = cur.fetchall()
-            # cur.close()
-            #
-            # for data in records:
-            #     info_doctor_prescriptor = doctors.get_doctors_by_id_v2(data[6])
-            #     if data[5] == 'INITIAL':
-            #         attentionNumber = 'Paciente Nuevo'
-            #     else:
-            #         attentionNumber = data[7]
-            #
-            #     content = {
-            #         'attentionNumber': attentionNumber,
-            #         'createdOn': data[1],
-            #         'doctor':  info_doctor_prescriptor['name'],
-            #         'doctorStatus': {
-            #             'enumType': "cobra.api.emuns.common.GenericStatus",
-            #             'name': info_doctor_prescriptor['status']
-            #         },
-            #         'id': data[2],
-            #         'local': data[3],
-            #         'patient': data[4],
-            #         'patientDoctor': '',
-            #         'patientDoctorStatus': {
-            #             'enumType': '',
-            #             'name': ''
-            #         }
-            #     }
-            #     payload.append(content)
-            #     content = {}
-            #
-            # return payload            try:
+            print("MY_PATIENTS")
             cur = conection.conn.cursor()
             cur.execute("""SELECT 
                                         attention_number, created_on, doctor_name, id, 
@@ -2316,6 +2271,7 @@ def appointments_by_user_mobile(token, type):
             payload = []
             content = {}
             for data in records:
+                print(data)
                 info_doctor_prescriptor = doctors.get_doctors_by_id_v2(data[6])
                 info_doctor_platonista = doctors.get_doctors_by_id_v2(data[7])
                 cr_date = data[1].strftime("%d/%m/%Y")
@@ -2341,6 +2297,7 @@ def appointments_by_user_mobile(token, type):
                 content = {}
             return payload
         if type['type'] == 'MY_ATTENTIONS':
+            print("MY_ATTENTIONS")
             cur = conection.conn.cursor()
             cur.execute("""SELECT 
                             attention_number, created_on, doctor_name, id, 
@@ -2352,6 +2309,7 @@ def appointments_by_user_mobile(token, type):
             payload = []
             content = {}
             for data in records:
+                print(data)
                 info_doctor_prescriptor = doctors.get_doctors_by_id_v2(data[6])
                 info_doctor_platonista = doctors.get_doctors_by_id_v2(data[7])
                 # cr_date = datetime.datetime.strptime(data[1], '%Y-%m-%d %H:%M:%S.%f')

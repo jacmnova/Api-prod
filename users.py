@@ -447,7 +447,7 @@ def forgot(user):
         password = temporal_password
         password = '{bcrypt}' + str(password).split("'")[1]
         cur = conection.conn.cursor()
-        cur.execute("""SELECT username, "name", app_type FROM public.login_user WHERE username = '""" + user + """'""")
+        cur.execute("""SELECT username, "name", app_type FROM public.login_user WHERE status = 'ACTIVE' and username = '""" + user + """'""")
         records = cur.fetchall()
         cur.close()
         print(records)
