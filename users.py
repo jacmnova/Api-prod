@@ -262,7 +262,7 @@ def get_user():
     cur = conection.conn.cursor()
     # cur.execute("""SELECT username, "name", doctor_id, app_type, role_user FROM public.login_user""")
     cur.execute("""SELECT id, "name", username, account_locked, app_type, role_user, doctor_id FROM public.login_user 
-                    WHERE enabled = true order by "name" asc """)
+                    WHERE status = 'ACTIVE' order by "name" asc """)
     records = cur.fetchall()
     cur.close()
     payload = []
@@ -304,7 +304,7 @@ def get_user():
 
 def get_data_user(username):
     cur = conection.conn.cursor()
-    cur.execute("SELECT id, password_expired, username, status, doctor_id ,app_type, role_user, temp_password, terms_condition, name FROM public.login_user WHERE username = '"+ username + "'")
+    cur.execute("SELECT id, password_expired, username, status, doctor_id ,app_type, role_user, temp_password, terms_condition, name FROM public.login_user WHERE status = 'ACTIVE' and  username = '"+ username + "'")
     records = cur.fetchall()
     content = {}
     for result in records:
