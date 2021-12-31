@@ -522,7 +522,7 @@ def delete_user(id):
     try:
         cur = conection.conn.cursor()
         cur.execute("UPDATE public.login_user SET enabled = false, status = 'DEACTIVATED' WHERE id =" + str(id))
-        conection.conn.cursor()
+        conection.conn.commit()
         cur.close()
         return
     except:
