@@ -1738,61 +1738,75 @@ def suporte_download():
 def appointments_search_download(info):
 
     payload = []
-    if len(info) == 0:
-        cur = conection.conn.cursor()
-        cur.execute("""SELECT 
-            attention_number,
-            patient_name, 
-            patient_medical_record, 
-            patient_covenat, 
-            patient_cpf, 
-            patient_phone, 
-            medicine, 
-            hospital_name, 
-            created_on, 
-            cid_id, 
-            cid_name, 
-            covenant, 
-            local_name, 
-            medicine_item_name, 
-            dose, 
-            doctor_name, 
-            doctor_specialty, 
-            doctor_cpf, 
-            doctor_atention_name, 
-            doctor_atention_specialty, 
-            doctor_atention_cpf
-            FROM public.appointment_complete ORDER BY ORDER BY created_on desc""")
-        records = cur.fetchall()
-        cur.close()
-        content = {}
-        for i in records:
-
-            content = {
-                'attention_number': i[0],
-                'patient_name': i[1],
-                'patient_medical_record': i[2],
-                'patient_covenat': i[3],
-                'patient_cpf': i[4],
-                'patient_phone': i[5],
-                'medicine': i[6],
-                'hospital_name': i[7],
-                'created_on': i[8].strftime("%Y/%m/%d %H:%M:%S"),
-                'cid_name': i[10],
-                'covenant': i[11],
-                'local_name': i[12],
-                'medicine_item_name': i[13],
-                'dose': i[14],
-                'doctor_name': i[15],
-                'doctor_specialty': i[16],
-                'doctor_cpf': i[17],
-                'doctor_atention_name': i[18],
-                'doctor_atention_specialty': i[19],
-                'doctor_atention_cpf': i[20],
-            }
-            payload.append(content)
+    # if info is None:
+    if len(info) == 1:
+        try:
+            cur = conection.conn.cursor()
+            cur.execute("""SELECT 
+                                app.attention_number, 
+                                app.patient_name, 
+                                app.patient_medical_record,
+                                app.patient_covenat,
+                                app.patient_cpf,
+                                app.patient_phone,
+                                app.medicine,
+                                app.hospital_name,
+                                app.created_on,
+                                app.cid_id,
+                                app.cid_name,
+                                app.covenant,
+                                app.local_name,
+                                app.medicine_item_name,
+                                app.dose,
+                                app.doctor_name,
+                                app.doctor_specialty,
+                                app.doctor_cpf,
+                                app.doctor_atention_name,
+                                app.doctor_atention_specialty,
+                                app.doctor_atention_cpf
+                           FROM public.appointment_complete app
+                           join public.doctor d on app.doctor_id = d.id 
+                           join public.doctor p on app.doctor_atention_id = p.id 
+                           join public.hospital h on app.hospital_id = h.id 
+                           ORDER BY created_on desc""")
+            records = cur.fetchall()
+            cur.close()
             content = {}
-        return payload
+            for i in records:
+                # info_doctor = doctors.get_doctors_by_id(i[7])
+                # info_doctorPatient = doctors.get_doctors_by_id(i[8])
+                # info_hospital = hospitals.get_hospital_by_id(i[9])
+                content = {
+                    'attention_number': i[0],
+                    'patient_name': i[1],
+                    'patient_medical_record': i[2],
+                    'patient_covenat': i[3],
+                    'patient_cpf': i[4],
+                    'patient_phone': i[5],
+                    'medicine': i[6],
+                    'hospital_name': i[7],
+                    'created_on': i[8].strftime("%Y/%m/%d %H:%M:%S"),
+                    'cid_name': i[10],
+                    'covenant': i[11],
+                    'local_name': i[12],
+                    'medicine_item_name': i[13],
+                    'dose': i[14],
+                    'doctor_name': i[15],
+                    'doctor_specialty': i[16],
+                    'doctor_cpf': i[17],
+                    'doctor_atention_name': i[18],
+                    'doctor_atention_specialty': i[19],
+                    'doctor_atention_cpf': i[20],
+                }
+                payload.append(content)
+                content = {}
+            return payload
+        except:
+            curs = conection.conn.cursor()
+            curs.execute("ROLLBACK")
+            conection.conn.commit()
+            curs.close()
+            return payload
 
     else:
 
@@ -1809,6 +1823,7 @@ def appointments_search_download(info):
         coma_patient = ""
 
         condition_cpf = ""
+        coma_cpf = ""
         where = ""
         # {'hospital': {'id': 3}, 'doctor': {'id': 3}, 'prescriptor': {'id': 1}, 'cpf': '123.123.123-12',
         #  'from': '23/11/2021', 'to': '23/11/2021'
@@ -1816,10 +1831,11 @@ def appointments_search_download(info):
             if (info['hospital']):
                 print("Estoy buscando por hospital")
                 condition_hospital = " hospital_id = " + str(info['hospital']['id'])
+                # if condition_hospital != "":
+                #     coma_hopsital = ' AND '
                 where = " where "
         except:
             print("Hospital not working")
-            where = ""
 
         try:
             if (info['doctor']):
@@ -1827,10 +1843,10 @@ def appointments_search_download(info):
                 condition_doctor = " doctor_id = " + str(info['doctor']['id'])
                 if condition_hospital != "":
                     coma_hopsital = ' AND '
+
                 where = " where "
         except:
-            print("DOCTOR not working")
-            where = ""
+            print("Hospital not working")
 
         try:
             if (info['prescriptor']):
@@ -1838,10 +1854,10 @@ def appointments_search_download(info):
                 condition_prescriptor = " doctor_atention_id = " + str(info['prescriptor']['id'])
                 if condition_doctor != "":
                     coma_doctor = ' AND '
+
                 where = " where "
         except:
-            print("PRESCRIPTOR not working")
-            where = ""
+            print("Hospital not working")
 
         try:
             if (info['patient']):
@@ -1851,19 +1867,17 @@ def appointments_search_download(info):
                     coma_prescriptor = ' AND '
                 where = " where "
         except:
-            print("PATIENT not working")
-            where = ""
+            print("Hospital not working")
 
         try:
             if (info['cpf']):
                 print("Estoy buscando por doctor")
                 condition_cpf = " patient_cpf = '" + str(info['cpf'] + "'")
-                if condition_patient != "":
-                    coma_patient = ' AND '
+                if condition_cpf != "":
+                    coma_cpf = ' AND '
                 where = " where "
         except:
-            print("CPF not working")
-            where = ""
+            print("Hospital not working")
 
         create_date = ""
         condition_dateFrom = ""
@@ -1873,39 +1887,61 @@ def appointments_search_download(info):
 
 
         try:
-            date_time_obj = datetime.strptime(info['from'], '%d/%m/%Y')
+            date_time_obj = datetime.datetime.strptime(info['from'], '%d/%m/%Y')
+            date_time_to = datetime.datetime.now()
             where = " where "
             create_date = " created_on BETWEEN "
-            condition_dateFrom = "'" + str(date_time_obj) +  "'"
+            condition_dateFrom = " '" + str(date_time_obj) + "' "
             coma_dateFrom = " AND "
-            condition_dateTo = "'" + str(date_time_obj) +  "'"
+            condition_dateTo = " '" + str(date_time_to) + "' "
+
+            if condition_hospital != "":
+                coma_hopsital = ' AND '
+            if condition_doctor != "":
+                coma_doctor = ' AND '
+            if condition_doctor != "":
+                coma_doctor = ' AND '
+            if condition_prescriptor != "":
+                coma_prescriptor = ' AND '
+
         except:
             print("date not workiing")
-            where = ""
 
         try:
             where = " where "
-            date_time_obj = datetime.strptime(info['to'],'%d/%m/%Y')
-            create_date = " created_on BETWEEN "
+            date_time_obj = datetime.datetime.strptime(info['to'], '%d/%m/%Y')
+            create_date = " created_on::DATE BETWEEN "
             if condition_dateFrom == "":
-                condition_dateFrom = "'" + str(date_time_obj) +  "'"
+                date_time_obj2= datetime.datetime.strptime('01/01/2020', '%d/%m/%Y')
+                condition_dateFrom = " '" + str(date_time_obj2) +  "' "
 
             coma_dateFrom = " AND "
-            condition_dateTo = "'" + str(date_time_obj) +  "'"
+            condition_dateTo = " '" + str(date_time_obj) +  "' "
         except:
             print("date not workiing")
-            where = ""
 
+        if condition_hospital != "" and condition_doctor == "" and condition_prescriptor == "" and condition_patient == "" and condition_cpf == "" and condition_dateFrom == "":
+            coma_hopsital = ""
 
+        if condition_doctor != "" and condition_hospital == "" and condition_prescriptor == "" and condition_patient == "" and condition_cpf == "" and condition_dateFrom == "":
+            coma_doctor = ""
 
-        # select *
-        # from cobra.appointment where
-        # created_on
-        # BETWEEN
-        # '2021-11-23' and '2021-11-23'
+        if condition_prescriptor != "" and condition_doctor == "" and condition_hospital == "" and condition_patient == "" and condition_cpf == "" and condition_dateFrom == "":
+            coma_prescriptor = ""
+
+        if condition_patient != "" and condition_doctor == "" and condition_prescriptor == "" and condition_hospital == "" and condition_cpf == "" and condition_dateFrom == "":
+            coma_patient = ""
+
+        if condition_cpf != "" and condition_doctor == "" and condition_prescriptor == "" and condition_patient == "" and condition_hospital == "" and condition_dateFrom == "":
+            coma_cpf = ""
 
         try:
+
             cur = conection.conn.cursor()
+            # print("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name ,created_on
+            #                FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
+            #             condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
+            #             str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
             cur.execute("""SELECT attention_number,
                             patient_name, 
                             patient_medical_record, 
@@ -1928,7 +1964,7 @@ def appointments_search_download(info):
                             doctor_atention_specialty, 
                             doctor_atention_cpf
                            FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
-                        condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
+                        condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + coma_cpf +  create_date +
                         str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
             records = cur.fetchall()
             cur.close()
@@ -1965,6 +2001,8 @@ def appointments_search_download(info):
             conection.conn.commit()
             curs.close()
             return payload
+
+
     return
 
 def appointments_download_by_id(id):
