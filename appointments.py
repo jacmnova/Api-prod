@@ -1742,33 +1742,79 @@ def appointments_search_download(info):
     if len(info) == 1:
         try:
             cur = conection.conn.cursor()
+            # cur.execute("""SELECT
+            #                     app.attention_number,
+            #                     app.patient_name,
+            #                     app.patient_medical_record,
+            #                     app.patient_covenat,
+            #                     app.patient_cpf,
+            #                     app.patient_phone,
+            #                     app.medicine,
+            #                     app.hospital_name,
+            #                     app.created_on,
+            #                     app.cid_id,
+            #                     app.cid_name,
+            #                     app.covenant,
+            #                     app.local_name,
+            #                     app.medicine_item_name,
+            #                     app.dose,
+            #                     app.doctor_name,
+            #                     app.doctor_specialty,
+            #                     app.doctor_cpf,
+            #                     app.doctor_atention_name,
+            #                     app.doctor_atention_specialty,
+            #                     app.doctor_atention_cpf
+            #                FROM public.appointment_complete app
+            #                join public.doctor d on app.doctor_id = d.id
+            #                join public.doctor p on app.doctor_atention_id = p.id
+            #                join public.hospital h on app.hospital_id = h.id
+            #                ORDER BY created_on desc""")
             cur.execute("""SELECT 
-                                app.attention_number, 
-                                app.patient_name, 
-                                app.patient_medical_record,
-                                app.patient_covenat,
-                                app.patient_cpf,
-                                app.patient_phone,
-                                app.medicine,
-                                app.hospital_name,
-                                app.created_on,
-                                app.cid_id,
-                                app.cid_name,
-                                app.covenant,
-                                app.local_name,
-                                app.medicine_item_name,
-                                app.dose,
-                                app.doctor_name,
-                                app.doctor_specialty,
-                                app.doctor_cpf,
-                                app.doctor_atention_name,
-                                app.doctor_atention_specialty,
-                                app.doctor_atention_cpf
+                        app.hospital_name,
+                        app.created_on,
+                        app.attention_number, 
+                        app.patient_name,
+                        app.doctor_name,
+                        s."name" as doctor_specialty,
+                        app.covenant,
+                        app.cid_name,
+                        app.medicine,
+                        app.dose,
+                        app.patient_cpf,
+                        app.patient_phone,
+                        app.doctor_atention_name,
+                        app.patient_medical_record,
+                        s2."name" as doctor_atention_specialty,
+                        app.local_name
+                        from (SELECT 
+                            app.attention_number, 
+                            app.patient_name, 
+                            app.patient_medical_record,
+                            app.patient_covenat,
+                            app.patient_cpf,
+                            app.patient_phone,
+                            app.medicine,
+                            app.hospital_name,
+                            app.created_on,
+                            app.cid_id,
+                            app.cid_name,
+                            app.covenant,
+                            app.local_name,
+                            app.medicine_item_name,
+                            app.dose,
+                            d."name" as doctor_name,
+                            d.specialty_id as doctor_specialty,
+                            d.cpf  as doctor_cpf,
+                            app.doctor_atention_name,
+                            p.specialty_id  as doctor_atention_specialty,
+                            p.cpf  as doctor_atention_cpf
                            FROM public.appointment_complete app
                            join public.doctor d on app.doctor_id = d.id 
                            join public.doctor p on app.doctor_atention_id = p.id 
                            join public.hospital h on app.hospital_id = h.id 
-                           ORDER BY created_on desc""")
+                           ORDER BY created_on desc) as app
+                           left join public.specialty s on app.doctor_specialty = s.id 
+                           left join public.specialty s2 on app.doctor_atention_specialty = s2.id""")
             records = cur.fetchall()
             cur.close()
             content = {}
@@ -1777,26 +1823,21 @@ def appointments_search_download(info):
                 # info_doctorPatient = doctors.get_doctors_by_id(i[8])
                 # info_hospital = hospitals.get_hospital_by_id(i[9])
                 content = {
-                    'attention_number': i[0],
-                    'patient_name': i[1],
-                    'patient_medical_record': i[2],
-                    'patient_covenat': i[3],
-                    'patient_cpf': i[4],
-                    'patient_phone': i[5],
-                    'medicine': i[6],
-                    'hospital_name': i[7],
-                    'created_on': i[8].strftime("%Y/%m/%d %H:%M:%S"),
-                    'cid_name': i[10],
-                    'covenant': i[11],
-                    'local_name': i[12],
-                    'medicine_item_name': i[13],
-                    'dose': i[14],
-                    'doctor_name': i[15],
-                    'doctor_specialty': i[16],
-                    'doctor_cpf': i[17],
-                    'doctor_atention_name': i[18],
-                    'doctor_atention_specialty': i[19],
-                    'doctor_atention_cpf': i[20],
+                    'Local_Procedimento': i[0],
+                    'Data': i[1].strftime("%Y/%m/%d"),
+                    'Atendimento': i[2],
+                    'Paciente': i[3],
+                    'Médico_Prescritor': i[4],
+                    'Especialidade_Medico_Prescritor': i[5],
+                    'Convenio': i[6],
+                    'CID': i[7],
+                    'Farmaco': i[8],
+                    'Dose': i[9],
+                    'CPF_Paciente': i[10],
+                    'Telefone': i[11],
+                    'Médico_Plantonista': i[12],
+                    'Prontuário': i[13],
+                    'Local_de_Atendimento': i[14]
                 }
                 payload.append(content)
                 content = {}
@@ -1942,55 +1983,102 @@ def appointments_search_download(info):
             #                FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
             #             condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
             #             str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
-            cur.execute("""SELECT attention_number,
-                            patient_name, 
-                            patient_medical_record, 
-                            patient_covenat, 
-                            patient_cpf, 
-                            patient_phone, 
-                            medicine, 
-                            hospital_name, 
-                            created_on, 
-                            cid_id, 
-                            cid_name, 
-                            covenant, 
-                            local_name, 
-                            medicine_item_name, 
-                            dose, 
-                            doctor_name, 
-                            doctor_specialty, 
-                            doctor_cpf, 
-                            doctor_atention_name, 
-                            doctor_atention_specialty, 
-                            doctor_atention_cpf
-                           FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
-                        condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + coma_cpf +  create_date +
-                        str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
+            print("""""")
+            cur.execute("""SELECT
+                                        app.hospital_name,
+                                    app.created_on,
+                                    app.attention_number, 
+                                    app.patient_name,
+                                    app.doctor_name,
+                                    s."name" as doctor_specialty,
+                                    app.covenant,
+                                    app.cid_name,
+                                    app.medicine,
+                                    app.dose,
+                                    app.patient_cpf,
+                                    app.patient_phone,
+                                    app.doctor_atention_name,
+                                    app.patient_medical_record,
+                                    s2."name" as doctor_atention_specialty,
+                                    app.local_name
+                                    from (
+                                    SELECT attention_number,
+                                        patient_name, 
+                                        patient_medical_record, 
+                                        patient_covenat, 
+                                        patient_cpf, 
+                                        patient_phone, 
+                                        medicine, 
+                                        hospital_name, 
+                                        created_on, 
+                                        cid_id, 
+                                        cid_name, 
+                                        covenant, 
+                                        local_name, 
+                                        medicine_item_name, 
+                                        dose, 
+                                        doctor_name, 
+                                        d.specialty_id as doctor_specialty,
+            	                        d.cpf as doctor_cpf,
+                                        doctor_atention_name, 
+                                        p.specialty_id as doctor_atention_specialty,
+            	                        p.cpf as doctor_atention_cpf
+                                       FROM public.appointment_complete 
+                                       left join public.doctor d on doctor_id = d.id 
+                                       left join public.doctor p on doctor_atention_id = p.id 
+                                       """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
+                  condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf +
+                  coma_cpf + create_date + str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) +
+                  """ORDER BY created_on desc""" +
+                  """) as app
+                     left join public.specialty s on app.doctor_specialty = s.id 
+                     left join public.specialty s2 on app.doctor_atention_specialty = s2.id""")
+
+
+            # cur.execute("""SELECT attention_number,
+            #                 patient_name,
+            #                 patient_medical_record,
+            #                 patient_covenat,
+            #                 patient_cpf,
+            #                 patient_phone,
+            #                 medicine,
+            #                 hospital_name,
+            #                 created_on,
+            #                 cid_id,
+            #                 cid_name,
+            #                 covenant,
+            #                 local_name,
+            #                 medicine_item_name,
+            #                 dose,
+            #                 doctor_name,
+            #                 doctor_specialty,
+            #                 doctor_cpf,
+            #                 doctor_atention_name,
+            #                 doctor_atention_specialty,
+            #                 doctor_atention_cpf
+            #                FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
+            #             condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + coma_cpf +  create_date +
+            #             str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
             records = cur.fetchall()
             cur.close()
             content = {}
             for i in records:
                 content = {
-                    'attention_number': i[0],
-                    'patient_name': i[1],
-                    'patient_medical_record': i[2],
-                    'patient_covenat': i[3],
-                    'patient_cpf': i[4],
-                    'patient_phone': i[5],
-                    'medicine': i[6],
-                    'hospital_name': i[7],
-                    'created_on': i[8].strftime("%Y/%m/%d %H:%M:%S"),
-                    'cid_name': i[10],
-                    'covenant': i[11],
-                    'local_name': i[12],
-                    'medicine_item_name': i[13],
-                    'dose': i[14],
-                    'doctor_name': i[15],
-                    'doctor_specialty': i[16],
-                    'doctor_cpf': i[17],
-                    'doctor_atention_name': i[18],
-                    'doctor_atention_specialty': i[19],
-                    'doctor_atention_cpf': i[20],
+                    'Local_Procedimento': i[0],
+                    'Data': i[1].strftime("%Y/%m/%d"),
+                    'Atendimento': i[2],
+                    'Paciente': i[3],
+                    'Médico_Prescritor': i[4],
+                    'Especialidade_Medico_Prescritor': i[5],
+                    'Convenio': i[6],
+                    'CID': i[7],
+                    'Farmaco': i[8],
+                    'Dose': i[9],
+                    'CPF_Paciente': i[10],
+                    'Telefone': i[11],
+                    'Médico_Plantonista': i[12],
+                    'Prontuário': i[13],
+                    'Local_de_Atendimento': i[14]
                 }
                 payload.append(content)
                 content = {}
