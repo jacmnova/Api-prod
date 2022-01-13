@@ -2127,21 +2127,21 @@ def appointments_search_download(info):
             content = {}
             for i in records:
                 content = {
-                    'Local_Procedimento': i[0],
-                    'Data': i[1].strftime("%Y/%m/%d"),
-                    'Atendimento': i[2],
-                    'Paciente': i[3],
-                    'Médico_Prescritor': i[4],
-                    'Especialidade_Medico_Prescritor': i[5],
-                    'Convenio': i[6],
-                    'CID': i[7],
-                    'Farmaco': i[8],
-                    'Dose': i[9],
-                    'CPF_Paciente': i[10],
-                    'Telefone': i[11],
-                    'Médico_Plantonista': i[12],
-                    'Prontuário': i[13],
-                    'Local_de_Atendimento': i[14]
+                    '01-Local_Procedimento': i[0],
+                    '02-Data': i[1].strftime("%Y/%m/%d"),
+                    '03-Atendimento': i[2],
+                    '04-Paciente': i[3],
+                    '05-Médico_Prescritor': i[4],
+                    '06-Especialidade_Medico_Prescritor': i[5],
+                    '07-Convenio': i[6],
+                    '08-CID': i[7],
+                    '09-Farmaco': i[8],
+                    '10-Dose': i[9],
+                    '11-CPF_Paciente': i[10],
+                    '12-Telefone': i[11],
+                    '13-Médico_Plantonista': i[12],
+                    '14-Prontuário': i[13],
+                    '15-Local_de_Atendimento': i[14]
                 }
                 payload.append(content)
                 content = {}
