@@ -1272,7 +1272,7 @@ def get_data_appointments_by_id(id):
                 'cid': {
                     'id': cid_id[0],
                     'name': cid_name[0],
-                    'status': cid_status[0]
+                    'status': cid_status
                 },
                 'covenant': i[3],
                 'cpf': i[4],
@@ -1532,10 +1532,72 @@ def appointments_search(info):
 
 def appointments_delete(info):
 
+    try:
+        cur = conection.conn.cursor()
+        cur.execute("""SELECT patient_id from public.appointment_complete WHERE id = """ + str(info))
+        data = cur.fetchall()
+        cur.close()
+
+        cur = conection.conn.cursor()
+        cur.execute("""UPDATE public.appointment_history SET nro_atendimiento = nro_atendimiento - 1 
+                                    WHERE patient_id = """ + str(data[0][0]))
+        conection.conn.commit()
+        cur.close()
+
+        cur = conection.conn.cursor()
+        cur.execute("""SELECT max(id) from public.appointment_complete WHERE id = """ + str(info))
+        info_resend = cur.fetchall()
+        cur.close()
+
+        if info_resend[0][0] > 0:
+            cur = conection.conn.cursor()
+            cur.execute("""SELECT hospital_id, hospital_name, created_on, patient_covenat, cid_id, cid_name, medicine, dose
+                                FROM public.appointment_complete WHERE id = """ + str(info_resend[0][0]))
+            data = cur.fetchall()
+            cur.close()
+
+            hospital_id = data[0][0]
+            hospital_name = data[0][1]
+            created_on = data[0][2]
+            patient_covenat = data[0][3]
+            cid_id = data[0][4]
+            cid_name = data[0][5]
+            medicine_info = medicine.get_medicine_by_name(data[0][6])
+            medicine_item_id = medicine_info['id']
+            medicine_item_name = data[0][6]
+            dose = data[0][7]
+            patient_id = data[0][0]
+
+            cur = conection.conn.cursor()
+            cur.execute("""UPDATE public.appointment_history SET
+                                hospital_id = %s,
+                                hospital_name = %s,
+                                data_last_atendimineto = %s,
+                                patient_covenat = %s,
+                                cid_id = %s,
+                                cid_name = %s,
+                                medicine_item_id = %s,
+                                medicine_item_name = %s,
+                                dose = %s
+                                WHERE patient_id = %s""",
+                        (hospital_id, hospital_name, created_on, patient_covenat, cid_id,
+                         cid_name, medicine_item_id, medicine_item_name, dose, patient_id))
+            conection.conn.commit()
+            cur.close()
+
+
+    except:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+
     cur = conection.conn.cursor()
     cur.execute("""DELETE FROM public.appointment_complete WHERE id = """ + str(info))
     conection.conn.commit()
     cur.close()
+
+
     return
 
 def suporte():
@@ -1822,22 +1884,23 @@ def appointments_search_download(info):
                 # info_doctor = doctors.get_doctors_by_id(i[7])
                 # info_doctorPatient = doctors.get_doctors_by_id(i[8])
                 # info_hospital = hospitals.get_hospital_by_id(i[9])
+
                 content = {
-                    'Local_Procedimento': i[0],
-                    'Data': i[1].strftime("%Y/%m/%d"),
-                    'Atendimento': i[2],
-                    'Paciente': i[3],
-                    'Médico_Prescritor': i[4],
-                    'Especialidade_Medico_Prescritor': i[5],
-                    'Convenio': i[6],
-                    'CID': i[7],
-                    'Farmaco': i[8],
-                    'Dose': i[9],
-                    'CPF_Paciente': i[10],
-                    'Telefone': i[11],
-                    'Médico_Plantonista': i[12],
-                    'Prontuário': i[13],
-                    'Local_de_Atendimento': i[14]
+                    '01-Local_Procedimento': i[0],
+                    '02-Data': i[1].strftime("%Y/%m/%d"),
+                    '03-Atendimento': i[2],
+                    '04-Paciente': i[3],
+                    '05-Médico_Prescritor': i[4],
+                    '06-Especialidade_Medico_Prescritor': i[5],
+                    '07-Convenio': i[6],
+                    '08-CID': i[7],
+                    '09-Farmaco': i[8],
+                    '10-Dose': i[9],
+                    '11-CPF_Paciente': i[10],
+                    '12-Telefone': i[11],
+                    '13-Médico_Plantonista': i[12],
+                    '14-Prontuário': i[13],
+                    '15-Local_de_Atendimento': i[14]
                 }
                 payload.append(content)
                 content = {}
@@ -2148,7 +2211,6 @@ def appointments_download_by_id(id):
         payload.append(content)
         content = {}
     return payload
-
 
 #Mobile
 def insert_appointments_mobile(info, token):

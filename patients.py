@@ -472,24 +472,29 @@ def get_info_patient(id):
     return content
 
 def delete(id):
-    cur = conection.conn.cursor()
-    # cur.execute("""DELETE FROM public.patient WHERE id= """ + str(id))
-    cur.execute("""UPDATE public.patient SET status='DELETED' WHERE id = """ + str(id))
-    conection.conn.commit()
-    cur.close()
-    return True
-    # try:
-    #     cur = conection.conn.cursor()
-    #     cur.execute("""DELETE FROM public.patient WHERE id= """ + str(id))
-    #     conection.conn.commit()
-    #     cur.close()
-    #     return True
-    # except:
-    #     curs = conection.conn.cursor()
-    #     curs.execute("ROLLBACK")
-    #     conection.conn.commit()
-    #     curs.close()
-    #     return False
+    try:
+        cur = conection.conn.cursor()
+        # cur.execute("""DELETE FROM public.patient WHERE id= """ + str(id))
+        cur.execute("""UPDATE public.patient SET status='DELETED' WHERE id = """ + str(id))
+        conection.conn.commit()
+        cur.close()
+
+        cur = conection.conn.cursor()
+        cur.execute("""DELETE FROM public.appointment_history WHERE patient_id = """ + str(id))
+        conection.conn.commit()
+        cur.close()
+        return True
+    except:
+        curs = conection.conn.cursor()
+        curs.execute("ROLLBACK")
+        conection.conn.commit()
+        curs.close()
+        return False
+    return
+
+
+
+
 
 def patients_download():
     cur = conection.conn.cursor()
