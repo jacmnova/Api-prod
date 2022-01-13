@@ -2141,7 +2141,7 @@ def appointments_search_download(info):
                     '12-Telefone': i[11],
                     '13-Médico_Plantonista': i[12],
                     '14-Prontuário': i[13],
-                    '15-Local_de_Atendimento': i[14]
+                    '15-Local_de_Atendimento': i[15]
                 }
                 payload.append(content)
                 content = {}
