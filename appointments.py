@@ -1804,33 +1804,7 @@ def appointments_search_download(info):
     if len(info) == 1:
         try:
             cur = conection.conn.cursor()
-            # cur.execute("""SELECT
-            #                     app.attention_number,
-            #                     app.patient_name,
-            #                     app.patient_medical_record,
-            #                     app.patient_covenat,
-            #                     app.patient_cpf,
-            #                     app.patient_phone,
-            #                     app.medicine,
-            #                     app.hospital_name,
-            #                     app.created_on,
-            #                     app.cid_id,
-            #                     app.cid_name,
-            #                     app.covenant,
-            #                     app.local_name,
-            #                     app.medicine_item_name,
-            #                     app.dose,
-            #                     app.doctor_name,
-            #                     app.doctor_specialty,
-            #                     app.doctor_cpf,
-            #                     app.doctor_atention_name,
-            #                     app.doctor_atention_specialty,
-            #                     app.doctor_atention_cpf
-            #                FROM public.appointment_complete app
-            #                join public.doctor d on app.doctor_id = d.id
-            #                join public.doctor p on app.doctor_atention_id = p.id
-            #                join public.hospital h on app.hospital_id = h.id
-            #                ORDER BY created_on desc""")
+            print("IMPRIMIENDO")
             cur.execute("""SELECT 
                         app.hospital_name,
                         app.created_on,
@@ -1846,10 +1820,10 @@ def appointments_search_download(info):
                         app.patient_phone,
                         app.doctor_atention_name,
                         app.patient_medical_record,
-                        s2."name" as doctor_atention_specialty,
-                        app.local_name
+                        l."name" 
                         from (SELECT 
                             app.attention_number, 
+                     		patient_info.local_id as patient_local_id,
                             app.patient_name, 
                             app.patient_medical_record,
                             app.patient_covenat,
@@ -1874,9 +1848,11 @@ def appointments_search_download(info):
                            join public.doctor d on app.doctor_id = d.id 
                            join public.doctor p on app.doctor_atention_id = p.id 
                            join public.hospital h on app.hospital_id = h.id 
+                           join public.patient patient_info on app.patient_id = patient_info.id 
                            ORDER BY created_on desc) as app
                            left join public.specialty s on app.doctor_specialty = s.id 
-                           left join public.specialty s2 on app.doctor_atention_specialty = s2.id""")
+                           left join public.specialty s2 on app.doctor_atention_specialty = s2.id
+                           left join public."local" l on app.patient_local_id = l.id """)
             records = cur.fetchall()
             cur.close()
             content = {}
@@ -1934,7 +1910,7 @@ def appointments_search_download(info):
         try:
             if (info['hospital']):
                 print("Estoy buscando por hospital")
-                condition_hospital = " hospital_id = " + str(info['hospital']['id'])
+                condition_hospital = " app.hospital_id = " + str(info['hospital']['id'])
                 # if condition_hospital != "":
                 #     coma_hopsital = ' AND '
                 where = " where "
@@ -1944,7 +1920,7 @@ def appointments_search_download(info):
         try:
             if (info['doctor']):
                 print("Estoy buscando por doctor")
-                condition_doctor = " doctor_id = " + str(info['doctor']['id'])
+                condition_doctor = " app.doctor_id = " + str(info['doctor']['id'])
                 if condition_hospital != "":
                     coma_hopsital = ' AND '
 
@@ -1955,7 +1931,7 @@ def appointments_search_download(info):
         try:
             if (info['prescriptor']):
                 print("Estoy buscando por doctor")
-                condition_prescriptor = " doctor_atention_id = " + str(info['prescriptor']['id'])
+                condition_prescriptor = " app.doctor_atention_id = " + str(info['prescriptor']['id'])
                 if condition_doctor != "":
                     coma_doctor = ' AND '
 
@@ -1966,7 +1942,7 @@ def appointments_search_download(info):
         try:
             if (info['patient']):
                 print("Estoy buscando por patient")
-                condition_patient = " patient_id = " + str(info['patient']['id'])
+                condition_patient = " app.patient_id = " + str(info['patient']['id'])
                 if condition_prescriptor != "":
                     coma_prescriptor = ' AND '
                 where = " where "
@@ -1976,7 +1952,7 @@ def appointments_search_download(info):
         try:
             if (info['cpf']):
                 print("Estoy buscando por doctor")
-                condition_cpf = " patient_cpf = '" + str(info['cpf'] + "'")
+                condition_cpf = " app.patient_cpf = '" + str(info['cpf'] + "'")
                 if condition_cpf != "":
                     coma_cpf = ' AND '
                 where = " where "
@@ -1994,7 +1970,7 @@ def appointments_search_download(info):
             date_time_obj = datetime.datetime.strptime(info['from'], '%d/%m/%Y')
             date_time_to = datetime.datetime.now()
             where = " where "
-            create_date = " created_on BETWEEN "
+            create_date = " app.created_on BETWEEN "
             condition_dateFrom = " '" + str(date_time_obj) + "' "
             coma_dateFrom = " AND "
             condition_dateTo = " '" + str(date_time_to) + "' "
@@ -2014,7 +1990,7 @@ def appointments_search_download(info):
         try:
             where = " where "
             date_time_obj = datetime.datetime.strptime(info['to'], '%d/%m/%Y')
-            create_date = " created_on::DATE BETWEEN "
+            create_date = " app.created_on::DATE BETWEEN "
             if condition_dateFrom == "":
                 date_time_obj2= datetime.datetime.strptime('01/01/2020', '%d/%m/%Y')
                 condition_dateFrom = " '" + str(date_time_obj2) +  "' "
@@ -2041,14 +2017,61 @@ def appointments_search_download(info):
 
         try:
 
+            print("""SELECT
+                                                app.hospital_name,
+                                                app.created_on,
+                                                app.attention_number, 
+                                                app.patient_name,
+                                                app.doctor_name,
+                                                s."name" as doctor_specialty,
+                                                app.covenant,
+                                                app.cid_name,
+                                                app.medicine,
+                                                app.dose,
+                                                app.patient_cpf,
+                                                app.patient_phone,
+                                                app.doctor_atention_name,
+                                                app.patient_medical_record,
+                                                s2."name" as doctor_atention_specialty,
+                                                l."name" as local_name
+                                                from (
+                                                SELECT attention_number,
+                                                                app.patient_name, 
+                                                                app.patient_medical_record, 
+                                                                app.patient_covenat, 
+                                                                app.patient_cpf, 
+                                                                app.patient_phone, 
+                                                                app.medicine, 
+                                                                app.hospital_name, 
+                                                                app.created_on, 
+                                                                app.cid_id, 
+                                                                app.cid_name, 
+                                                                app.covenant, 
+                                                                patient_info.local_id as patient_local_id, 
+                                                                app.medicine_item_name, 
+                                                                app.dose, 
+                                                                app.doctor_name, 
+                                                                d.specialty_id as doctor_specialty,
+                                    	                        d.cpf as doctor_cpf,
+                                                                doctor_atention_name, 
+                                                                p.specialty_id as doctor_atention_specialty,
+                                    	                        p.cpf as doctor_atention_cpf
+                                                               FROM public.appointment_complete app
+                                                               left join public.doctor d on app.doctor_id = d.id 
+                                                               left join public.doctor p on app.doctor_atention_id = p.id 
+                                                               join public.patient patient_info on app.patient_id = patient_info.id 
+                                                   """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
+                  condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf +
+                  coma_cpf + create_date + str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) +
+                  """ ORDER BY created_on desc""" +
+                  """) as app
+                     left join public.specialty s on app.doctor_specialty = s.id 
+                     left join public.specialty s2 on app.doctor_atention_specialty = s2.id
+                     left join public."local" l on app.patient_local_id = l.id""")
+
             cur = conection.conn.cursor()
-            # print("""SELECT id, attention_number, patient_name, doctor_name, doctor_atention_name, hospital_name ,created_on
-            #                FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
-            #             condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + create_date +
-            #             str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
-            print("""""")
             cur.execute("""SELECT
-                                        app.hospital_name,
+                                    app.hospital_name,
                                     app.created_on,
                                     app.attention_number, 
                                     app.patient_name,
@@ -2063,65 +2086,42 @@ def appointments_search_download(info):
                                     app.doctor_atention_name,
                                     app.patient_medical_record,
                                     s2."name" as doctor_atention_specialty,
-                                    app.local_name
+                                    l."name" as local_name
                                     from (
                                     SELECT attention_number,
-                                        patient_name, 
-                                        patient_medical_record, 
-                                        patient_covenat, 
-                                        patient_cpf, 
-                                        patient_phone, 
-                                        medicine, 
-                                        hospital_name, 
-                                        created_on, 
-                                        cid_id, 
-                                        cid_name, 
-                                        covenant, 
-                                        local_name, 
-                                        medicine_item_name, 
-                                        dose, 
-                                        doctor_name, 
-                                        d.specialty_id as doctor_specialty,
-            	                        d.cpf as doctor_cpf,
-                                        doctor_atention_name, 
-                                        p.specialty_id as doctor_atention_specialty,
-            	                        p.cpf as doctor_atention_cpf
-                                       FROM public.appointment_complete 
-                                       left join public.doctor d on doctor_id = d.id 
-                                       left join public.doctor p on doctor_atention_id = p.id 
+                                                    app.patient_name, 
+                                                    app.patient_medical_record, 
+                                                    app.patient_covenat, 
+                                                    app.patient_cpf, 
+                                                    app.patient_phone, 
+                                                    app.medicine, 
+                                                    app.hospital_name, 
+                                                    app.created_on, 
+                                                    app.cid_id, 
+                                                    app.cid_name, 
+                                                    app.covenant, 
+                                                    patient_info.local_id as patient_local_id, 
+                                                    app.medicine_item_name, 
+                                                    app.dose, 
+                                                    app.doctor_name, 
+                                                    d.specialty_id as doctor_specialty,
+                        	                        d.cpf as doctor_cpf,
+                                                    doctor_atention_name, 
+                                                    p.specialty_id as doctor_atention_specialty,
+                        	                        p.cpf as doctor_atention_cpf
+                                                   FROM public.appointment_complete app
+                                                   left join public.doctor d on app.doctor_id = d.id 
+                                                   left join public.doctor p on app.doctor_atention_id = p.id 
+                                                   join public.patient patient_info on app.patient_id = patient_info.id 
                                        """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
                   condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf +
                   coma_cpf + create_date + str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) +
-                  """ORDER BY created_on desc""" +
+                  """ORDER BY app.created_on desc""" +
                   """) as app
                      left join public.specialty s on app.doctor_specialty = s.id 
-                     left join public.specialty s2 on app.doctor_atention_specialty = s2.id""")
+                     left join public.specialty s2 on app.doctor_atention_specialty = s2.id
+                     left join public."local" l on app.patient_local_id = l.id""")
 
-
-            # cur.execute("""SELECT attention_number,
-            #                 patient_name,
-            #                 patient_medical_record,
-            #                 patient_covenat,
-            #                 patient_cpf,
-            #                 patient_phone,
-            #                 medicine,
-            #                 hospital_name,
-            #                 created_on,
-            #                 cid_id,
-            #                 cid_name,
-            #                 covenant,
-            #                 local_name,
-            #                 medicine_item_name,
-            #                 dose,
-            #                 doctor_name,
-            #                 doctor_specialty,
-            #                 doctor_cpf,
-            #                 doctor_atention_name,
-            #                 doctor_atention_specialty,
-            #                 doctor_atention_cpf
-            #                FROM public.appointment_complete """ + where + condition_hospital + coma_hopsital + condition_doctor + coma_doctor +
-            #             condition_prescriptor + coma_prescriptor + condition_patient + coma_patient + condition_cpf + coma_cpf +  create_date +
-            #             str(condition_dateFrom) + coma_dateFrom + str(condition_dateTo) + "ORDER BY created_on desc")
             records = cur.fetchall()
             cur.close()
             content = {}
